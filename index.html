@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Pathfinding - hex, canvas</title>
+        <link rel="stylesheet" href="style.css" />
+        <script src="pathfinding.js" defer></script>
+    </head>
+    <body>
+        <h1>Hex Pathfinding</h1>
+        <div id="canvas-holder">
+            <canvas id="drawing-board"> </canvas>
+            <img src="./grocery-store-layout.png" alt="grocery store map" id="map">
+        </div>
+        
+        <div>
+            <button onclick="toggleSquareButtons()">TOGGLE HEXES CLICKABLE</button>
+            <button onclick="clearPaths()">CLEAR PATHS</button>
+            <button id="make-obstacles" onclick="toggleMakeObstacles(event)">MAKE OBSTACLES</button>
+            <button id="set-path-button" onclick="startSetWaypoints(event)">SET WAYPOINTS</button>
+        </div>
+        <div id="output-container">
+            <button onclick="toggleOutput(event)">OPEN OUTPUT</button>
+            <button id="copy-output-button" onclick="copyOutput(event)">COPY OUTPUT</button>
+            <div id="output">
+                
+            </div>
+        </div>
+        
+    </body>
+</html>

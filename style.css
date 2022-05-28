@@ -1,0 +1,75 @@
+html,body {
+    box-sizing: border-box;
+}
+
+h1 {
+    color: red;
+}
+#canvas-holder {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    /* box-sizing: border-box; */
+    border: 2px solid purple;
+    background-color: rgb(167, 255, 176);
+}
+#drawing-board {
+    position: absolute;
+    box-sizing: border-box;
+    border: 1px solid red;
+    width: calc(0px + 100%);
+    height: calc(0px + 100%);
+}
+#canvas-holder > img {
+    width: 100%;
+    height: auto;
+}
+.square-button{
+    position: absolute;
+    padding: 0;
+    background-color: transparent;
+    /* box-shadow: inset 0 0 3px lightskyblue; rgba(0,100,255,0.1); */
+    
+    border: 0.125px dotted orange;
+    /* background-color: rgba(255,255,0,0.5); */
+    /* box-sizing: border-box; */
+}
+
+.square-button.obstacle {
+    background-color: grey;
+}
+.square-button.waypoint {
+    background-color: red;
+}
+button.make-obstacles-on {
+    background-color: mediumseagreen;
+}
+
+#copy-output-button {
+    display: none;
+}
+#copy-output-button.open {
+    display: inline-block;
+}
+#output-container {
+    position: absolute;
+    padding: 2em;
+    background-color: #eee;
+    font-family: monospace;
+    border: 2px solid #222;
+    overflow-y:scroll;
+    box-sizing: border-box;
+}
+#output {
+    
+    color: #222;
+    font-family: monospace;
+    overflow-y:scroll;
+    box-sizing: border-box;
+}
+#output-container.open {
+    width: 100%;
+    height: 100%;
+    top: 0;
+}
+
