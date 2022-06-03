@@ -6,9 +6,25 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Pathfinding - grid, canvas</title>
         <link rel="stylesheet" href="style.css" />
-        <script src="pathfinding.js" defer></script>
+        <script src="./PF-index.js" defer></script>
+        <script src="./PF-grid.js" defer></script>
+        <script src="./PF-pathfinding.js" defer></script>
+        <script src="./grid-data.js"></script>
+        <!-- <script src="pathfinding.js" type="module">
+            // import * as PF from "./pathfinding.js";
+        </script> -->
+        <!-- <script type="module">
+            import * as TEST from "./module-test.js";
+            TEST.logIt("FUUUUUUUU");
+            window.sayIt = TEST.logIt;
+        </script> -->
+        <!-- <script  type="module">
+            import * as Main from "./main.js";
+            Main.start();
+        </script> -->
     </head>
     <body>
+        <!-- <button id="say-it" onclick="sayIt('MODULES ROCK')">SAY IT</button> -->
         <h1>Grid Pathfinding</h1>
         <div id="canvas-holder">
             <canvas id="drawing-board"> </canvas>
@@ -16,10 +32,11 @@
         </div>
         
         <div>
-            <button onclick="toggleSquareButtons()">TOGGLE HEXES CLICKABLE</button>
+            <button onclick="toggleTileButtons()">TOGGLE HEXES CLICKABLE</button>
             <button onclick="clearPaths()">CLEAR PATHS</button>
             <button id="make-obstacles" onclick="toggleMakeObstacles(event)">MAKE OBSTACLES</button>
             <button id="set-path-button" onclick="startSetWaypoints(event)">SET WAYPOINTS</button>
+            <button id="rebuild-board" onclick="rebuildBoard(event)">REBUILD BOARD</button>
         </div>
         <div id="output-container">
             <button onclick="toggleOutput(event)">OPEN OUTPUT</button>
@@ -28,6 +45,8 @@
                 
             </div>
         </div>
-        
+        <script>
+            console.log("hello from index.html");
+        </script>
     </body>
 </html>
