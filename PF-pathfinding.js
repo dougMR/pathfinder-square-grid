@@ -1,7 +1,15 @@
-
 /* PATHFINDING */
 
 const findPathFromAtoB = (A, B) => {
+    // A and B are tile/square objects
+    // Find Path from square A to square B
+    // Returns Array of segments, or null
+
+    // Handle case A === B
+    if (A === B) {
+        console.log("A is B!");
+        return([makeSegment(A,A)]);
+    }
     console.log(
         "findPathFromAtoB(",
         A.col,
@@ -13,11 +21,10 @@ const findPathFromAtoB = (A, B) => {
         B.row,
         ")"
     );
-    // Find Path from square A to square B
-    // returns array of segments
-    const allSegments = [];
+
+    // const allSegments = [];
     // start from A, get segs to all neighbors
-    A.endSegment = getSegment(A, A);
+    A.endSegment = makeSegment(A, A);
     // Keep track of all the segments we put down last iteration
     const lastSegs = [A.endSegment];
 
@@ -25,6 +32,7 @@ const findPathFromAtoB = (A, B) => {
     let iterations = 0;
     let noNewSegs = false;
     do {
+        // console.log('lastSegs: ',lastSegs.length);
         const newSegs = [];
         for (let segIndex = 0; segIndex < lastSegs.length; segIndex++) {
             // nextSeg from lastSegs
@@ -39,7 +47,7 @@ const findPathFromAtoB = (A, B) => {
             // Branch out to Neighbors
             // Alternate clockwise/counter-clockwise,
             // because *maybe that makes for tighter zig-zags?
-            const clockwise = true; //segIndex % 2 === 0;
+            const clockwise = segIndex % 2 === 0;
             // Look for Neighbors (n)
             // console.log(
             //     `   ==== neighbors for ${lastSeg.toSquare.col}, ${lastSeg.toSquare.row}`
@@ -54,11 +62,13 @@ const findPathFromAtoB = (A, B) => {
                     ? n
                     : lastSeg.toSquare.neighbors.length - n - increment;
                 nextNeighbor = lastSeg.toSquare.neighbors[nextN];
+                // console.log(nextNeighbor);
                 if (
                     nextNeighbor != null &&
                     !nextNeighbor.endSegment &&
                     !nextNeighbor.obstacle
                 ) {
+                    // console.log('nextNeighbor good so far...');
                     // Clear so far, but also check to
                     // console.log(
                     //     "   ===  next neighbor: ",
@@ -71,9 +81,9 @@ const findPathFromAtoB = (A, B) => {
                     let isCorner = false;
                     if (nextN % 2 === 1) {
                         isCorner = true;
-                        console.log(`neighbor ${nextN} checkIllegalCorner`);
-                        // It's a corner neighbor, get the neighbors just before ane after this neighbor
+                        // console.log(`neighbor ${nextN} checkIllegalCorner`);
 
+                        // It's a corner neighbor, get the neighbors just before and after this neighbor
                         const neighbors = lastSeg.toSquare.neighbors;
                         const preN =
                             (nextN + neighbors.length - 1) % neighbors.length;
@@ -129,26 +139,30 @@ const findPathFromAtoB = (A, B) => {
                     }
                     if (notIllegalCorner) {
                         // create a new segment from lastSeg's end square to neighbor
-                        const newSeg = getSegment(
+                        const newSeg = makeSegment(
                             lastSeg.toSquare,
                             nextNeighbor,
                             lastSeg,
                             isCorner
                         );
+                        // console.log('nextNeighbor approved');
                         nextNeighbor.endSegment = newSeg;
-                        allSegments.push(newSeg);
-
+                        // allSegments.push(newSeg);
+                        drawSegment(newSeg, "rgba(0,0,0,.1)");
                         // is nextNeighbor square B?
                         if (nextNeighbor === B) {
                             // console.log("Found Target!");
+
                             // Found Target!
                             foundTarget = true;
                             const fullPath = getFullPathFromEndSegment(newSeg);
-                            clearPaths();
-                            console.log("lastSegs: ", lastSegs);
+                            // clearPaths();
+                            // console.log('fullPath: ',fullPath.length);
+                            // console.log("lastSegs: ", lastSegs);
+                            clearSegsFromTiles();
                             return fullPath;
                         } else {
-                            newSeg.draw("rgba(0,0,0,0.5");
+                            newSeg.draw("rgba(0,0,0,0.1");
                             // nextNeighbor.obstacle= true;
 
                             if (isCorner) {
@@ -161,12 +175,13 @@ const findPathFromAtoB = (A, B) => {
                 }
             }
         }
+        // console.log(`newSegs.length: ${newSegs.length}`);
         if (newSegs.length === 0) {
             noNewSegs = true;
             console.log("No New Segs");
             break;
         } else {
-            console.log(">> lastSegs.length: ", lastSegs.length, " <<");
+            // console.log(">> lastSegs.length: ", lastSegs.length, " <<");
 
             lastSegs.length = 0;
             lastSegs.push(...newSegs);
@@ -174,9 +189,10 @@ const findPathFromAtoB = (A, B) => {
         iterations++;
     } while (!foundTarget && iterations < 2000 && !noNewSegs);
     // console.log("iterations: ", iterations);
+    return null;
 };
 
-const drawPathAtoB = (Atile, Btile) => {
+const drawPathAtoB = (Atile, Btile, pathOnly = false) => {
     console.log(
         "drawPathAtoB(",
         Atile.col,
@@ -193,23 +209,28 @@ const drawPathAtoB = (Atile, Btile) => {
         console.log("Can't get there from here");
     } else {
         console.log("myPath: ", myPath.length);
-        // clearPaths();
+        if (pathOnly) clearPaths();
+        paths.push(myPath);
         drawPath(myPath);
     }
     return myPath;
 };
 const drawPath = (pathAr) => {
     for (const segment of pathAr) {
-        segment.draw();
+        segment.draw("yellow");
     }
 };
 
 const clearPaths = () => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // console.log('clearPaths()');
+    paths.length = 0;
+    redrawGrid();
+};
+
+const clearSegsFromTiles = () => {
     for (const col of grid) {
-        for (const square of col) {
-            drawSquare(square);
-            square.endSegment = null;
+        for (const tile of col) {
+            tile.endSegment = null;
         }
     }
 };
@@ -217,31 +238,33 @@ const clearPaths = () => {
 /*
     PATH SEGMENT
 */
-const getSquareCenterOnCanvas = (square) => {
-    const x = square.size * square.col + square.size * 0.5;
-    const y = square.size * square.row + square.size * 0.5;
-    return { x, y };
-};
-const drawSegment = (square1, square2, color) => {
-    console.log("drawSegment()");
+
+const drawSegment = (segment, color) => {
+    // console.log("drawSegment()");
     // Get square center on canvas
-    const h0coord = getSquareCenterOnCanvas(square1);
-    const h1coord = getSquareCenterOnCanvas(square2);
+    const h0coord = getSquareCenterOnCanvas(segment.fromSquare);
+    const h1coord = getSquareCenterOnCanvas(segment.toSquare);
     ctx.beginPath();
     ctx.moveTo(h0coord.x, h0coord.y);
     ctx.lineTo(h1coord.x, h1coord.y);
     ctx.closePath();
-    ctx.lineWidth = 5;
-    ctx.strokeStyle = color ? color : "yellow";
+    if (color) {
+        ctx.lineWidth = 8;
+        ctx.strokeStyle = "rgba(0,0,0,0.6)";
+        ctx.stroke();
+    }
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = color ? color : pink;
     ctx.stroke();
 };
-const getSegment = (square1, square2, parentSeg = null, diagonal = false) => {
+const makeSegment = (square1, square2, parentSeg = null, diagonal = false) => {
     const segment = {
         fromSquare: square1,
         toSquare: square2,
         isDiagonal: diagonal,
-        draw: (color) => {
-            drawSegment(square1, square2, color);
+        draw: function (color) {
+            // console.log('this: ',this);
+            drawSegment(this, color);
         },
         parentSeg,
     };
@@ -249,6 +272,7 @@ const getSegment = (square1, square2, parentSeg = null, diagonal = false) => {
 };
 const getFullPathFromEndSegment = (endSeg) => {
     // console.log("findPathFromAtoB/getFullPathFromEndSegment()");
+
     const path = [endSeg];
     let parentSeg = endSeg.parentSeg;
     let tooMuch = 0;
@@ -270,6 +294,7 @@ const getFullPathFromEndSegment = (endSeg) => {
 
 /* WAYPOINTS */
 const orderByClosest = (waypoints) => {
+    // console.log('orderByClosest()');
     const orderedWPs = [];
     const unorderedWPs = [...waypoints];
     // pull out first WP as startWP, put it in orderedWPs
@@ -279,6 +304,7 @@ const orderByClosest = (waypoints) => {
     while (unorderedWPs.length > 1 && tooMuch < 100) {
         // find closest WP of unorderedWPs to startWP
         const closestWP = getClosestWaypoint(startWP, unorderedWPs);
+        // console.log(`closestWP: ${closestWP.col}, ${closestWP.row}`);
         // make that startWP, pull it from unorderedWPs, push it to orderedWPs
         startWP = closestWP;
         unorderedWPs.splice(unorderedWPs.indexOf(startWP), 1);
@@ -286,6 +312,7 @@ const orderByClosest = (waypoints) => {
         // repeat until unorderedWPs has only 1 left, then push that to orderedWPs
         tooMuch++;
     }
+    // add the last one
     orderedWPs.push(...unorderedWPs);
 
     // returned ordered list
@@ -293,6 +320,7 @@ const orderByClosest = (waypoints) => {
 };
 
 const getClosestWaypoint = (Awp, Barray) => {
+    // console.log('getClosestWaypoint()');
     // params: button, button array
     if (Barray < 1) {
         return null;
@@ -300,6 +328,7 @@ const getClosestWaypoint = (Awp, Barray) => {
     const distances = [];
     for (let b = 0; b < Barray.length; b++) {
         const path = findPathFromAtoB(Awp.mySquare, Barray[b].mySquare);
+        // console.log('path.length: ',path.length);
         let dist = path.length;
         for (const segment of path) {
             if (segment.isDiagonal) {

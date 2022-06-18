@@ -1,4 +1,5 @@
-html,body {
+html,
+body {
     box-sizing: border-box;
 }
 
@@ -20,30 +21,57 @@ h1 {
     border: 1px solid red;
     width: calc(0px + 100%);
     height: calc(0px + 100%);
+    /* Ultimately, we might use the canvas for all mouse events, so this may change */
+    pointer-events: none;
 }
 #canvas-holder > img {
     width: 100%;
     height: auto;
 }
-.square-button{
+#marquee {
+    display: none;
+    position: absolute;
+    border: 2px dashed yellow;
+    box-shadow: 0 0 0 2px black;
+    pointer-events: none;
+}
+#marquee.on {
+    display: block;
+}
+.square-button {
     position: absolute;
     padding: 0;
-    background-color: transparent;
-    /* box-shadow: inset 0 0 3px lightskyblue; rgba(0,100,255,0.1); */
-    
-    border: 0.125px dotted orange;
+    background-color: rgba(255,255,255,0.25);
+    /* box-shadow: inset 0 0 0 1px lightskyblue; */
+    /*border:  0.125px dotted orange; */
+    border: none;
     /* background-color: rgba(255,255,0,0.5); */
     /* box-sizing: border-box; */
 }
 
 .square-button.obstacle {
     background-color: grey;
+    background: linear-gradient(45deg, #5a5a5a, rgb(200, 200, 200), #272727);
+    border: none;
 }
 .square-button.waypoint {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     background-color: red;
+    padding: 0.5em;
+    border-radius: 50%;
+    border: 2px solid rgba(0, 0, 0, 0.3);
+    color: yellow;
+    text-shadow: 0.1em 0.1em 0 black, -0.1em -0.1em 0 black,-0.1em 0.1em 0 black, 0.1em -0.1em 0 black;
 }
-button.make-obstacles-on {
+button.make-obstacles-on,
+button#marquee-button.on {
     background-color: mediumseagreen;
+}
+
+button#add-item.waiting {
+    background-color: rgb(167, 255, 176);
 }
 
 #copy-output-button {
@@ -58,14 +86,13 @@ button.make-obstacles-on {
     background-color: #eee;
     font-family: monospace;
     border: 2px solid #222;
-    overflow-y:scroll;
+    overflow-y: scroll;
     box-sizing: border-box;
 }
 #output {
-    
     color: #222;
     font-family: monospace;
-    overflow-y:scroll;
+    overflow-y: scroll;
     box-sizing: border-box;
 }
 #output-container.open {
@@ -73,4 +100,3 @@ button.make-obstacles-on {
     height: 100%;
     top: 0;
 }
-

@@ -1,8 +1,10 @@
 /* GRID INTERACTION */
 
 const drawSquare = (square) => {
-    const x = square.size * square.col + square.size * 0.5;
-    const y = square.size * square.row + square.size * 0.5;
+    // const x = squareSize * square.col + squareSize * 0.5;
+    // const y = squareSize * square.row + squareSize * 0.5;
+    let x,y;
+    ({x,y} = getSquareCenterOnCanvas(square));
 
     drawSquareOnCanvas(square);
 
@@ -26,6 +28,12 @@ const getSquareByIndices = (colIndex, rowIndex) => {
     return grid[colIndex][rowIndex];
 };
 
+const getSquareByCoordinates = (x,y) => {
+    const col = Math.floor(x / squareSize);
+    const row = Math.floor(y / squareSize);
+    return getSquareByIndices(col,row);
+}
+
 const getNeighborSquares = (square) => {
     // 0 - 7 clockwise, starting above
     const x = square.col;
@@ -36,7 +44,7 @@ const getNeighborSquares = (square) => {
             col < 0 ||
             col >= grid.length ||
             row < 0 ||
-            row >= grid["numRows"]
+            row >= numRows
         ) {
             neighbors.push(null);
         } else {
@@ -62,18 +70,18 @@ const getNeighborSquares = (square) => {
     return neighbors;
 };
 
-const buildGrid = (numColumns, numRows, size) => {
+const buildGrid = (numColumns, numRows) => {
     // console.log("buildGrid()");
     const grid = [];
-    grid["numRows"] = numRows;
-    grid["numColumns"] = numColumns;
+    numRows = numRows;
+    numColumns = numColumns;
     // const diagonal = Math.sqrt(size * size + size * size);
     for (let col = 0; col < numColumns; col++) {
         grid.push([]);
         for (let row = 0; row < numRows; row++) {
             // Create Squares
             const square = {
-                size,
+                // size,
                 // diagonal,
                 col,
                 row,
@@ -88,15 +96,24 @@ const buildGrid = (numColumns, numRows, size) => {
     return grid;
 };
 
+const recalcSquareSize = () => {
+    squareSize = canvas.offsetWidth / numColumns;
+}
+
+const getSquareCenterOnCanvas = (square) => {
+    const x = squareSize * square.col + squareSize * 0.5;
+    const y = squareSize * square.row + squareSize * 0.5;
+    return { x, y };
+};
+
 const buildGridFromData = (gridData) => {
     const grid = [];
     // const squareSize = gridData.squareSize;
-    const numCols = grid["numColumns"] = gridData.numColumns;
-    const numRows = grid["numRows"] = gridData.numRows;
-    console.log('canvas: ',canvas);
-    console.log('canvas.offsetWidth: ',canvas.offsetWidth);
-    squareSize = canvas.offsetWidth / numCols;
-    console.log('squareSize: ',squareSize);
+    numColumns = gridData.numColumns;
+    numRows = gridData.numRows;
+    // squareSize = canvas.offsetWidth / numCols;
+    recalcSquareSize();
+    // console.log('squareSize: ',squareSize);
     // console.log("data.grid.length: ",gridData.grid.length);
     for (let col = 0; col < gridData.grid.length; col++) {
         grid.push([]);
@@ -135,9 +152,9 @@ const setNeighbors = (grid) => {
 };
 
 function drawSquareOnCanvas(square) {
-    const half = square.size * 0.5;
-    let x = square.col * square.size + half;
-    let y = square.row * square.size + half;
+    const half = squareSize * 0.5;
+    let x = square.col * squareSize + half;
+    let y = square.row * squareSize + half;
     ctx.beginPath();
     ctx.moveTo(x - half, y - half);
     ctx.lineTo(x + half, y - half);
@@ -147,7 +164,7 @@ function drawSquareOnCanvas(square) {
 
     ctx.closePath();
     ctx.strokeStyle = "rgba(0,0,0,0.85)";
-    ctx.lineWidth = Math.min(squareSize * 0.1, "0.5");
+    ctx.lineWidth = Math.min(squareSize * 0.1, "0.25");
     ctx.stroke();
 
     // Draw same, offset in contrasting color
@@ -164,12 +181,32 @@ function drawSquareOnCanvas(square) {
     ctx.stroke();
 }
 
-function drawGrid(cols, rows) {
-    for (let col = 0; col < cols - 1; col++) {
-        for (let row = 0; row < rows - 1; row++) {
-            drawSquareOnCanvas(grid[col][row]);
+function redrawGrid(keepPaths = false) {
+    // Re-draws grid
+    console.log('redrawGrid('+keepPaths+')');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (const col of grid) {
+        for (const square of col) {
+            drawSquare(square);
+            if(keepPaths && square.endSegment){
+                console.log(square.endSegment);
+                drawSegment(square.endSegment.fromSquare, square.endSegment.toSquare);
+            }else{
+                square.endSegment = null;
+            }
         }
     }
+    if(keepPaths){
+        console.log('paths.length',paths.length);
+        for (const path of paths) {
+            drawPath(path);
+        }
+    }
+    // for (let col = 0; col < numColumns - 1; col++) {
+    //     for (let row = 0; row < numRows - 1; row++) {
+    //         drawSquareOnCanvas(grid[col][row]);
+    //     }
+    // }
 }
 
 /* END GRID FUNCTIONS */
