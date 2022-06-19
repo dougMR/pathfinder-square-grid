@@ -12,41 +12,45 @@ const itemInput = document.getElementById("item-input");
 console.log(itemInput);
 let settingItemLocation = false;
 const setItemLocationButton = document.getElementById("add-item");
-const addItemToInventory = (name,x,y) => {
-    items.push({name,loc:{x,y}});
-}
+const addItemToInventory = (name, x, y) => {
+    items.push({ name, loc: { x, y } });
+};
 const setItemLocation = (evt) => {
-    console.log('setItemLocation: ',evt);
-    console.log('settingItemLocation: ',settingItemLocation);
+    console.log("setItemLocation: ", evt);
+    console.log("settingItemLocation: ", settingItemLocation);
     // Can be called from UI button or Tile button
     if (settingItemLocation) {
         console.log(evt.target.mySquare);
         if (evt.target.mySquare != null) {
             // Set item at location
-            addItemToInventory(itemInput.value,evt.target.mySquare.col,evt.target.mySquare.row);
-            itemInput.value = '';
+            addItemToInventory(
+                itemInput.value,
+                evt.target.mySquare.col,
+                evt.target.mySquare.row
+            );
+            itemInput.value = "";
             setItemLocationButton.classList.remove("waiting");
             settingItemLocation = false;
-            console.log('items: ',items);
+            console.log("items: ", items);
         } else {
             // location is null
             // pick location first
-
         }
     } else {
-        if(itemInput.value != ''){
+        if (itemInput.value != "") {
             // start Setting location
             setItemLocationButton.classList.add("waiting");
             settingItemLocation = true;
         }
-        
     }
 };
 const startSetWaypoints = (evt) => {
     // called by button in HTML
     // ==== Doubles as Draw Paths button
     settingWaypoints = !settingWaypoints;
-   document.getElementById("set-path-button").innerHTML = settingWaypoints ? "DRAW PATH" : "SET WAYPOINTS";
+    document.getElementById("set-path-button").innerHTML = settingWaypoints
+        ? "DRAW PATH"
+        : "SET WAYPOINTS";
     if (settingWaypoints) {
         // Set Waypoints mode
         // Start setting waypoints
@@ -62,6 +66,13 @@ const startSetWaypoints = (evt) => {
         if (waypoints.length > 1) {
             console.log("waypoints: ", waypoints);
             // order waypoints from first to closest to closest to closest...
+            /*
+
+            v Put all this in Traveling-Salesman function
+              Start at first tile, end at last tile,
+              sort the in-between tiles to shrotest path from start to end
+
+            */
             const orderedWPs = orderByClosest(waypoints);
             // Need at least 2 waypoints to draw path
             console.log("orderedWaypoints: ", orderedWPs);
@@ -94,6 +105,11 @@ const startSetWaypoints = (evt) => {
             for (const path of paths) {
                 drawPath(path);
             }
+            /* 
+
+            End Traveling Salesman
+
+            */
             // Hide Waypoints
             // for(const wp of waypoints){
             //     wp.classList.remove('waypoint');
@@ -101,36 +117,46 @@ const startSetWaypoints = (evt) => {
         }
     }
 };
-const setWaypoint = (tileButton) => {
+const setWaypoint = (tileButton, isStartPoint = false) => {
     // Set Tilebutton color
     tileButton.classList.add("waypoint");
-    waypoints.push(tileButton);
+    if (isStartPoint) {
+        waypoints.unshift(tileButton);
+    } else {
+        waypoints.push(tileButton);
+    }
 };
 const setWaypointsFromItems = (event) => {
-    if(!squareButtonsOn)createTileButtons();
-    if(!settingWaypoints)startSetWaypoints();
-    for(const item of items){
-        console.log('item: ',item);
-        const tileButton = document.querySelector(`[data-col="${item.loc.x}"][data-row="${item.loc.y}"]`);
+    if (!squareButtonsOn) createTileButtons();
+    if (!settingWaypoints) startSetWaypoints();
+    for (const item of items) {
+        console.log("item: ", item);
+        const tileButton = document.querySelector(
+            `[data-col="${item.loc.x}"][data-row="${item.loc.y}"]`
+        );
         setWaypoint(tileButton);
     }
-}
+    const startTileButton = getTileButtonByLoc(42,43);
+    setWaypoint(startTileButton,true);
+    const endButtonTile = getTielButtonByLoc(25,35);
+    setWaypoint(endButtonTile);
+};
 const toggleOutput = (evt) => {
     outputOpen = !outputOpen;
-    
+
     const outputHolder = document.querySelector("#output-container");
     outputHolder.classList.toggle("open");
     document.querySelector("#copy-output-button").classList.toggle("open");
     evt.target.innerText = outputOpen ? "CLOSE OUTPUT" : "OPEN OUTPUT";
     if (outputOpen) {
         const id = evt.target.getAttribute("id");
-        if( id === "board-data-button"){
+        if (id === "board-data-button") {
             generateGridOutput();
-        }else if(id==="inventory-data-button"){
-            const itemsJson = '<pre>'+JSON.stringify(items,null,4)+'</pre>';
+        } else if (id === "inventory-data-button") {
+            const itemsJson =
+                "<pre>" + JSON.stringify(items, null, 4) + "</pre>";
             output(itemsJson);
         }
-        
     } else {
         output("");
     }
@@ -185,8 +211,8 @@ const makeTileButton = (square) => {
         // console.log("OCCUPIED: ", evt.target.mySquare.obstacle);
         // console.log("evt: ", evt);
         // console.log("evt.clientY: ", evt.clientY);
-        if(settingItemLocation){
-            if(itemInput.value != '') setItemLocation(evt);
+        if (settingItemLocation) {
+            if (itemInput.value != "") setItemLocation(evt);
             return;
         }
 
@@ -264,7 +290,7 @@ const createTileButtons = () => {
     }
     squareButtonsOn = true;
 };
-const getTileButtonByIndices = (x, y) => {
+const getTileButtonByLoc = (x, y) => {
     return document.querySelector(`[data-col="${x}"][data-row="${y}"]`);
 };
 const toggleObstacle = (tileButton) => {

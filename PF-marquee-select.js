@@ -27,7 +27,7 @@ const toggleMarqueedTiles = () => {
     console.log('toggleMarqueedTiles()');
     for(const tile of getMarqueedTiles()){
         console.log('tile: ',tile);
-        const tileButton = getTileButtonByIndices(tile.col,tile.row);
+        const tileButton = getTileButtonByLoc(tile.col,tile.row);
         setObstacle(tile);
         if (addingObstacles) {
             tileButton.classList.add("obstacle");

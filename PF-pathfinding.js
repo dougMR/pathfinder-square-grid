@@ -1,15 +1,12 @@
 /* PATHFINDING */
+// A path is an array of segments
 
 const findPathFromAtoB = (A, B) => {
     // A and B are tile/square objects
     // Find Path from square A to square B
     // Returns Array of segments, or null
 
-    // Handle case A === B
-    if (A === B) {
-        console.log("A is B!");
-        return([makeSegment(A,A)]);
-    }
+    
     console.log(
         "findPathFromAtoB(",
         A.col,
@@ -22,14 +19,19 @@ const findPathFromAtoB = (A, B) => {
         ")"
     );
 
-    // const allSegments = [];
     // start from A, get segs to all neighbors
     A.endSegment = makeSegment(A, A);
+    
     // Keep track of all the segments we put down last iteration
     const lastSegs = [A.endSegment];
 
+    // Handle case A === B
+    if (A === B) {
+        return(lastSegs);
+    }
+
     let foundTarget = false;
-    let iterations = 0;
+    // let iterations = 0;
     let noNewSegs = false;
     do {
         // console.log('lastSegs: ',lastSegs.length);
@@ -186,29 +188,31 @@ const findPathFromAtoB = (A, B) => {
             lastSegs.length = 0;
             lastSegs.push(...newSegs);
         }
-        iterations++;
-    } while (!foundTarget && iterations < 2000 && !noNewSegs);
+        // iterations++;
+    // } while (!foundTarget && iterations < 2000 && !noNewSegs);
+} while (!foundTarget && !noNewSegs);
     // console.log("iterations: ", iterations);
     return null;
 };
 
 const drawPathAtoB = (Atile, Btile, pathOnly = false) => {
-    console.log(
-        "drawPathAtoB(",
-        Atile.col,
-        " ",
-        Atile.row,
-        ", ",
-        Btile.col,
-        " ",
-        Btile.row,
-        ")"
-    );
+    // Find path AtoB and draw it
+    // console.log(
+    //     "drawPathAtoB(",
+    //     Atile.col,
+    //     " ",
+    //     Atile.row,
+    //     ", ",
+    //     Btile.col,
+    //     " ",
+    //     Btile.row,
+    //     ")"
+    // );
     const myPath = findPathFromAtoB(Atile, Btile);
     if (!myPath) {
         console.log("Can't get there from here");
     } else {
-        console.log("myPath: ", myPath.length);
+        // console.log("myPath: ", myPath.length);
         if (pathOnly) clearPaths();
         paths.push(myPath);
         drawPath(myPath);
@@ -341,6 +345,16 @@ const getClosestWaypoint = (Awp, Barray) => {
     const index = distances.indexOf(min);
     return Barray[index];
 };
+
+const getShortestRoute(tiles){
+    // tiles is an array of points
+    // returns an array of tiles in optimized order
+    // first and last tiles remain first and last
+
+    let shortestDistance = Infinity;
+
+    
+}
 
 /* END WAYPOINTS */
 
