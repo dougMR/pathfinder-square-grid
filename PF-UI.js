@@ -3,9 +3,9 @@
 // const rebuildBoard = (evt) => {
 //     ctx.clearRect(0, 0, canvas.width, canvas.height);
 //     removeTileButtons();
-//     const cols = Math.floor(canvas.offsetWidth / squareSize);
-//     const rows = Math.floor(canvas.offsetHeight / squareSize);
-//     grid = buildGrid(cols, rows, squareSize);
+//     const cols = Math.floor(canvas.offsetWidth / tileSize);
+//     const rows = Math.floor(canvas.offsetHeight / tileSize);
+//     grid = buildGrid(cols, rows, tileSize);
 //     setNeighbors(grid);
 // };
 const itemInput = document.getElementById("item-input");
@@ -15,18 +15,17 @@ const setItemLocationButton = document.getElementById("add-item");
 const addItemToInventory = (name, x, y) => {
     items.push({ name, loc: { x, y } });
 };
-const setItemLocation = (evt) => {
-    console.log("setItemLocation: ", evt);
+const setItemLocation = (tile) => {
+    console.log("setItemLocation: ", tile);
     console.log("settingItemLocation: ", settingItemLocation);
     // Can be called from UI button or Tile button
     if (settingItemLocation) {
-        console.log(evt.target.mySquare);
-        if (evt.target.mySquare != null) {
+        if (tile != null) {
             // Set item at location
             addItemToInventory(
                 itemInput.value,
-                evt.target.mySquare.col,
-                evt.target.mySquare.row
+                tile.col,
+                tile.row
             );
             itemInput.value = "";
             setItemLocationButton.classList.remove("waiting");
@@ -79,16 +78,16 @@ const startSetWaypoints = (evt) => {
             for (let wp = 0; wp < orderedWPs.length - 1; wp++) {
                 console.log("wp index: ", wp);
                 console.log(
-                    "orderedWPs[wp].mySquare: ",
-                    orderedWPs[wp].mySquare
+                    "orderedWPs[wp]: ",
+                    orderedWPs[wp]
                 );
                 console.log(
-                    "orderedWPs[wp + 1].mySquare: ",
-                    orderedWPs[wp + 1].mySquare
+                    "orderedWPs[wp + 1]: ",
+                    orderedWPs[wp + 1]
                 );
                 const path = drawPathAtoB(
-                    orderedWPs[wp].mySquare,
-                    orderedWPs[wp + 1].mySquare
+                    orderedWPs[wp],
+                    orderedWPs[wp + 1]
                 );
                 if (path) {
                     paths.push(path);
@@ -117,29 +116,32 @@ const startSetWaypoints = (evt) => {
         }
     }
 };
-const setWaypoint = (tileButton, isStartPoint = false) => {
+const setWaypoint = (tile, isStartPoint = false) => {
     // Set Tilebutton color
+    const tileButton = getTileButtonByIndices(tile.col,tile.row);
+    // console.log(`tileButton ${tile.col} ${tile.row}: ${tileButton}`);
+
     tileButton.classList.add("waypoint");
     if (isStartPoint) {
-        waypoints.unshift(tileButton);
+        waypoints.unshift(tile);
     } else {
-        waypoints.push(tileButton);
+        waypoints.push(tile);
     }
 };
 const setWaypointsFromItems = (event) => {
-    if (!squareButtonsOn) createTileButtons();
+    if (!tileButtonsOn) createTileButtons();
     if (!settingWaypoints) startSetWaypoints();
     for (const item of items) {
-        console.log("item: ", item);
-        const tileButton = document.querySelector(
-            `[data-col="${item.loc.x}"][data-row="${item.loc.y}"]`
-        );
-        setWaypoint(tileButton);
+        // console.log("item: ", item);
+        const tile = getTileByIndices(item.loc.x,item.loc.y);
+        setWaypoint(tile);
     }
-    const startTileButton = getTileButtonByLoc(42,43);
-    setWaypoint(startTileButton,true);
-    const endButtonTile = getTielButtonByLoc(25,35);
-    setWaypoint(endButtonTile);
+    // Store Entrance
+    const startTile = getTileByIndices(42,43);
+    setWaypoint(startTile,true);
+    // Checkout
+    const endTile = getTileByIndices(25,35);
+    setWaypoint(endTile);
 };
 const toggleOutput = (evt) => {
     outputOpen = !outputOpen;
@@ -168,35 +170,36 @@ const copyOutput = (evt) => {
 const toggleMakeObstacles = () => {
     setObstaclesOn = !setObstaclesOn;
     makeObstaclesButton.classList.toggle("make-obstacles-on");
-    if (setObstaclesOn && !squareButtonsOn) {
+    if (setObstaclesOn && !tileButtonsOn) {
         createTileButtons();
     }
 };
 
-const maybeDrawPath = (square) => {
-    if (!startSquare) {
-        // first square clicked
-        startSquare = square;
-    } else if (!endSquare) {
-        endSquare = square;
-        drawPathAtoB(startSquare, square, true);
-        startSquare = endSquare = null;
+const maybeDrawPath = (tile) => {
+    if(tile.obstacle)return;
+    if (!startTile) {
+        // first tile clicked
+        startTile = tile;
+    } else if (!endTile) {
+        endTile = tile;
+        drawPathAtoB(startTile, tile, true);
+        startTile = endTile = null;
     }
 };
-const makeTileButton = (square) => {
+const makeTileButton = (tile) => {
     const newButton = document.createElement("button");
-    newButton.classList.add("square-button");
-    newButton.setAttribute("data-col", square.col);
-    newButton.setAttribute("data-row", square.row);
-    newButton.style.height = newButton.style.width = `${squareSize}px`;
+    newButton.classList.add("tile-button");
+    newButton.setAttribute("data-col", tile.col);
+    newButton.setAttribute("data-row", tile.row);
+    newButton.style.height = newButton.style.width = `${tileSize}px`;
     newButton.style.marginTop = newButton.style.marginLeft = `${
-        0 - squareSize * 0.5
+        0 - tileSize * 0.5
     }px`;
-    const center = getSquareCenterOnCanvas(square);
+    const center = getTileCenterOnCanvas(tile);
     newButton.style.left = center.x + "px";
     newButton.style.top = center.y + "px";
-    newButton.mySquare = square;
-    if (square.obstacle) {
+    newButton.myTile = tile;
+    if (tile.obstacle) {
         newButton.classList.add("obstacle");
     }
     gridHolderDiv.appendChild(newButton);
@@ -204,36 +207,36 @@ const makeTileButton = (square) => {
     newButton.addEventListener("mousedown", (evt) => {
         // console.log(
         //     "MY SQUARE: ",
-        //     evt.target.mySquare.col,
+        //     evt.target.myTile.col,
         //     ", ",
-        //     evt.target.mySquare.row
+        //     evt.target.myTile.row
         // );
-        // console.log("OCCUPIED: ", evt.target.mySquare.obstacle);
+        // console.log("OCCUPIED: ", evt.target.myTile.obstacle);
         // console.log("evt: ", evt);
         // console.log("evt.clientY: ", evt.clientY);
         if (settingItemLocation) {
-            if (itemInput.value != "") setItemLocation(evt);
+            if (itemInput.value != "") setItemLocation(evt.target.myTile);
             return;
         }
 
-        if (settingWaypoints && !evt.target.mySquare.obstacle) {
-            setWaypoint(evt.target);
+        if (settingWaypoints && !evt.target.myTile.obstacle) {
+            setWaypoint(evt.target.myTile);
             return;
         }
         // TODO: Move a lot into startDrag() function
         // Start Drag
         dragging = true;
         startDragPos = getMouseXY(evt);
-        startDragTile = evt.target.mySquare;
+        startDragTile = evt.target.myTile;
         if (marqueeOn) {
             // Show marquee
             marqueeDiv.classList.add("on");
         } else if (setObstaclesOn) {
-            toggleObstacle(evt.target);
-            addingObstacles = evt.target.mySquare.obstacle;
+            toggleObstacle(evt.target.myTile);
+            addingObstacles = evt.target.myTile.obstacle;
         } else {
             // Draw Path if !setObstaclesOn && !marqueeOn
-            maybeDrawPath(evt.target.mySquare);
+            maybeDrawPath(evt.target.myTile);
         }
     });
     newButton.addEventListener("mousemove", (evt) => {
@@ -242,9 +245,9 @@ const makeTileButton = (square) => {
         if (dragging) {
             if (marqueeOn) {
                 drawMarquee();
-                currentDragTile = evt.target.mySquare;
+                currentDragTile = evt.target.myTile;
             } else if (setObstaclesOn) {
-                setObstacle(evt.target.mySquare, addingObstacles);
+                setObstacle(evt.target.myTile, addingObstacles);
             }
         }
     });
@@ -260,6 +263,8 @@ const makeTileButton = (square) => {
     });
     obstacleButtons.push(newButton);
 };
+
+
 const toggleTileButtons = (onOrOff) => {
     if (obstacleButtons.length > 0) {
         removeTileButtons();
@@ -272,7 +277,7 @@ const removeTileButtons = () => {
         button.remove();
     }
     obstacleButtons.length = 0;
-    squareButtonsOn = false;
+    tileButtonsOn = false;
     if (setObstaclesOn) {
         toggleMakeObstacles();
     }
@@ -281,30 +286,26 @@ const createTileButtons = () => {
     console.log("createTileButtons()");
     // first make sure they don't already exist
     if (obstacleButtons.length === 0) {
-        recalcSquareSize();
+        recalcTileSize();
         for (const col of grid) {
-            for (const square of col) {
-                makeTileButton(square);
+            for (const tile of col) {
+                makeTileButton(tile);
             }
         }
     }
-    squareButtonsOn = true;
+    tileButtonsOn = true;
 };
-const getTileButtonByLoc = (x, y) => {
-    return document.querySelector(`[data-col="${x}"][data-row="${y}"]`);
+const toggleObstacle = (tile) => {
+    console.log(`toggleObstacle(${tile.col}, ${tile.row})`);
+    console.log(`tile.obstacle from: ${tile.obstacle}`);
+    // toggle tile's obstacle property
+    setObstacle(tile, !tile.obstacle);
+    console.log(`tile.obstacle to: ${tile.obstacle}`);
 };
-const toggleObstacle = (tileButton) => {
-    const square = tileButton.mySquare;
-    console.log(`toggleObstacle(${square.col}, ${square.row})`);
-    console.log(`square.obstacle from: ${square.obstacle}`);
-    // toggle square's obstacle property
-    setObstacle(square, !square.obstacle);
-    console.log(`square.obstacle to: ${square.obstacle}`);
-};
-const setObstacle = (square, isOn = true) => {
-    square.obstacle = isOn;
+const setObstacle = (tile, isOn = true) => {
+    tile.obstacle = isOn;
     const btn = document.querySelector(
-        `[data-col="${square.col}"][data-row="${square.row}"]`
+        `[data-col="${tile.col}"][data-row="${tile.row}"]`
     );
     if (isOn) {
         btn.classList.add("obstacle");
@@ -313,7 +314,7 @@ const setObstacle = (square, isOn = true) => {
     }
 };
 const buttonFindPath = () => {
-    alert("click two squarees");
+    alert("click two tilees");
     // clearPaths();
     createTileButtons();
 };
@@ -324,3 +325,8 @@ const getMouseXY = (evt) => {
     var y = evt.clientY - rect.top; //y position within the element.
     return { x, y };
 };
+const getTileButtonByIndices = (col,row) => {
+    return document.querySelector(
+        `[data-col="${col}"][data-row="${row}"]`
+    );
+}

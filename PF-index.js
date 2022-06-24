@@ -31,11 +31,12 @@ const output = (txt, add = false) => {
     outputDiv.innerHTML = prevText + txt;
 };
 const generateGridOutput = () => {
+    // Generates and displays grid JSON data
     // gridOutput(JSON.stringify(grid));
     let colIndex = 0;
     let rowIndex = 0;
     let gridOutput = "";
-    gridOutput += `gridData = {squareSize:${squareSize}, numRows: ${numRows}, numColumns: ${numColumns}, grid:[`;
+    gridOutput += `gridData = {tileSize:${tileSize}, numRows: ${numRows}, numColumns: ${numColumns}, grid:[`;
     for (const col of grid) {
         rowIndex = 0;
         gridOutput += `[<br />`;
@@ -79,14 +80,14 @@ const outputDiv = document.querySelector("#output");
 const makeObstaclesButton = document.querySelector("#make-obstacles");
 const marqueeButton = document.querySelector("#marquee-button");
 const gridHolderDiv = document.querySelector("#tile-buttons-holder");
-let startSquare, endSquare;
+let startTile, endTile;
 let setObstaclesOn = false;
 let marqueeOn = false;
 const obstacleButtons = [];
 // obstacleButtons just means tileButtons RENAME
 let dragging = false;
 let addingObstacles = true;
-let squareButtonsOn = false;
+let tileButtonsOn = false;
 let outputOpen = false;
 let settingWaypoints = false;
 const waypoints = [];
@@ -94,31 +95,95 @@ const paths = [];
 
 // END HTML BUTTON FUNCTIONS
 
-let squareSize = 20;
+let tileSize = 20;
 let numRows, numColumns;
 function init() {
     console.log("init()");
 
     setCanvasDimensions();
-    numColumns = Math.floor(canvas.offsetWidth / squareSize);
-    numRows = Math.floor(canvas.offsetHeight / squareSize);
-    // squareSize = Math.round(canvas.offsetWidth / numColumns);
+    numColumns = Math.floor(canvas.offsetWidth / tileSize);
+    numRows = Math.floor(canvas.offsetHeight / tileSize);
+    // tileSize = Math.round(canvas.offsetWidth / numColumns);
     // grid = buildGrid(numColumns, numRows);
     grid = buildGridFromData(gridData);
     setNeighbors(grid);
     const diagonal = Math.sqrt(
-        squareSize * squareSize + squareSize * squareSize
+        tileSize * tileSize + tileSize * tileSize
     );
-    console.log("diagonal ratio: ", (diagonal - squareSize) / squareSize);
+    console.log("diagonal ratio: ", (diagonal - tileSize) / tileSize);
     // console.log(grid[17][5].neighbors[1] === null);
     console.log(
         "height calc: ",
         canvas.offsetHeight,
-        squareSize,
-        canvas.offsetHeight / squareSize
+        tileSize,
+        canvas.offsetHeight / tileSize
     );
     resizeGrid();
+    makeCanvasHandlers();
 }
+
+const makeCanvasHandlers = () => {
+    const startTouchCanvas = (evt) => {
+        const mouseXY = getMouseXY(evt);
+        const thisTile = getTileByCoordinates(mouseXY.x, mouseXY.y);
+        // Setting Item location
+        if (settingItemLocation) {
+            if (itemInput.value != "") setItemLocation(thisTile);
+            return;
+        }
+        // Setting Waypoint
+        if (settingWaypoints && !thisTile.obstacle) {
+            setWaypoint(thisTile);
+            return;
+        }
+        // Start Drag
+        dragging = true;
+        startDragPos = mouseXY;
+
+        startDragTile = thisTile;
+        if (marqueeOn) {
+            // Show marquee
+            marqueeDiv.classList.add("on");
+        } else if (setObstaclesOn) {
+            toggleObstacle(thisTile);
+            addingObstacles = thisTile.obstacle;
+        } else {
+            // Draw Path if !setObstaclesOn && !marqueeOn
+            maybeDrawPath(thisTile);
+        }
+    };
+    const moveOverCanvas = (evt) => {
+        // TODO: Move a lot into drag() function
+        mousePos = getMouseXY(evt);
+        const thisTile = getTileByCoordinates(mousePos.x, mousePos.y);
+        if (dragging) {
+            if (marqueeOn) {
+                drawMarquee();
+                
+                currentDragTile = thisTile;
+            } else if (setObstaclesOn) {
+                setObstacle(thisTile, addingObstacles);
+            }
+        }
+    };
+    const endTouchCanvas = (evt) => {
+        dragging = false;
+        if (marqueeOn) {
+            marqueeDiv.classList.remove("on");
+            toggleMarqueedTiles();
+        }
+    };
+    // Start touch
+    canvas.addEventListener("touchstart", startTouchCanvas);
+    canvas.addEventListener("mousedown", startTouchCanvas);
+    // Move
+    canvas.addEventListener("touchmove",moveOverCanvas)
+    canvas.addEventListener("mousemove",moveOverCanvas)
+    // End touch
+    canvas.addEventListener("touchend",endTouchCanvas);
+    canvas.addEventListener("mouseup",endTouchCanvas);
+
+};
 
 window.addEventListener("load", (evt) => {
     // after everything on page is loaded and parsed
@@ -127,13 +192,13 @@ window.addEventListener("load", (evt) => {
 });
 const resizeGrid = () => {
     setCanvasDimensions();
-    recalcSquareSize();
+    recalcTileSize();
     redrawGrid(true);
-    if (squareButtonsOn) {
+    if (tileButtonsOn) {
         removeTileButtons();
         createTileButtons();
     }
-}
+};
 window.addEventListener("resize", (evt) => {
     // console.log("Resize(*)");
     resizeGrid();

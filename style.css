@@ -15,6 +15,9 @@ h1 {
     border: 2px solid purple;
     background-color: rgb(167, 255, 176);
 }
+#tile-buttons-holder {
+    pointer-events: none;
+}
 #drawing-board {
     position: absolute;
     box-sizing: border-box;
@@ -22,7 +25,7 @@ h1 {
     width: calc(0px + 100%);
     height: calc(0px + 100%);
     /* Ultimately, we might use the canvas for all mouse events, so this may change */
-    pointer-events: none;
+    /* pointer-events: none; */
 }
 #canvas-holder > img {
     width: 100%;
@@ -38,28 +41,29 @@ h1 {
 #marquee.on {
     display: block;
 }
-.square-button {
+.tile-button {
     position: absolute;
     padding: 0;
-    background-color: rgba(255,255,255,0.25);
+    /* background-color: transparent; */
+    background-color: rgba(0,0,0,0.1);
+    /* background-color: rgba(255,255,255,0.25); */
     /* box-shadow: inset 0 0 0 1px lightskyblue; */
     /*border:  0.125px dotted orange; */
     border: none;
-    /* background-color: rgba(255,255,0,0.5); */
     /* box-sizing: border-box; */
 }
 
-.square-button.obstacle {
-    background-color: grey;
-    background: linear-gradient(45deg, #5a5a5a, rgb(200, 200, 200), #272727);
+.tile-button.obstacle {
+    background-color: #555;
+    background: linear-gradient(45deg, #5a5a5a, rgb(157, 144, 144), #272727);
     border: none;
 }
-.square-button.waypoint {
+.tile-button.waypoint {
     display: flex;
     justify-content: center;
     align-items: center;
     background-color: red;
-    padding: 0.5em;
+    padding: 0.25em;
     border-radius: 50%;
     border: 2px solid rgba(0, 0, 0, 0.3);
     color: yellow;

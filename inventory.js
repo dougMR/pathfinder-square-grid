@@ -96,16 +96,19 @@ let items = [
             "x": 41,
             "y": 29
         }
+    },
+    {
+        "name": "potatoes",
+        "loc": {
+            "x": 5,
+            "y": 28
+        }
+    },
+    {
+        "name": "pasta",
+        "loc": {
+            "x": 18,
+            "y": 15
+        }
     }
 ]
-// const reconfigItems = [];
-// for (const item of items) {
-//     reconfigItems.push({
-//         name: item.name,
-//         loc: item.loc,
-//     });
-// }
-// items.length = [];
-// for (const item of reconfigItems) {
-//     items.push(item);
-// }

@@ -16,7 +16,7 @@ const getMarqueedTiles = () => {
     const marqueedTiles = [];
     for (let col = minCol; col <= maxCol; col++) {
         for (let row = minRow; row <= maxRow; row++) {
-            marqueedTiles.push(getSquareByIndices(col, row));
+            marqueedTiles.push(getTileByIndices(col, row));
         }
     }
     console.log('getMarqueedTiles.length',marqueedTiles.length);
@@ -26,8 +26,8 @@ const getMarqueedTiles = () => {
 const toggleMarqueedTiles = () => {
     console.log('toggleMarqueedTiles()');
     for(const tile of getMarqueedTiles()){
-        console.log('tile: ',tile);
-        const tileButton = getTileButtonByLoc(tile.col,tile.row);
+        // console.log('tile: ',tile);
+        const tileButton = getTileButtonByIndices(tile.col,tile.row);
         setObstacle(tile);
         if (addingObstacles) {
             tileButton.classList.add("obstacle");
@@ -51,7 +51,7 @@ const drawMarquee = () => {
 const toggleMarquee = (evt) => {
     marqueeOn = !marqueeOn;
     marqueeButton.classList.toggle("on");
-    if (marqueeOn && !squareButtonsOn) {
+    if (marqueeOn && !tileButtonsOn) {
         createTileButtons();
     }
 };
