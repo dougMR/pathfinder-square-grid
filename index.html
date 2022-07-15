@@ -6,6 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Pathfinding - grid, canvas</title>
         <link rel="stylesheet" href="style.css" />
+        <script src="./JamesStWegmans.js" defer></script>
         <script src="./PF-index.js" defer></script>
         <script src="./PF-grid.js" defer></script>
         <script src="./PF-pathfinding.js" defer></script>
@@ -13,6 +14,9 @@
         <script src="./PF-UI.js" defer></script>
         <script src="./PF-marquee-select.js" defer></script>
         <script src="./inventory.js"></script>
+        <script src="./PF-TSP-mutation.js" defer></script>
+        <script src="./PF-dist-lookup.js" defer></script>
+        <script src="./PF-math.js"></script>
         <!-- <script src="pathfinding.js" type="module">
             // import * as PF from "./pathfinding.js";
         </script> -->
@@ -32,25 +36,32 @@
         <div id="canvas-holder">
             <div id="tile-buttons-holder"></div>
             <canvas id="drawing-board"> </canvas>
-            <img src="./grocery-store-layout.png" alt="grocery store map" id="map">
+            <!-- <img src="./images/grocery-store-layout.png" alt="grocery store map" id="map"> -->
+            <img src="./images/JamesStWegmans_floorplan.jpg" alt="grocery store map" id="map">
             <div id="marquee"></div>
         </div>
         
         <div>
             <!-- Buttons for testing -->
-            <button onclick="toggleTileButtons()">TOGGLE TILE DIVS</button>
+            <!-- <button id="rebuild-board" onclick="rebuildBoard(event)">REBUILD BOARD</button> -->
+            <button id="set-path-button" onclick="startSetWaypoints(event)">SET WAYPOINTS</button>
+            <button id="rebuild-board" onclick="setWaypointsFromItems(event)">SET WPs BY ITEMS</button>
             <button onclick="clearPaths()">CLEAR PATHS</button>
+
+            <br/><br/>
+            <button onclick="toggleTileButtons()">TOGGLE TILE DIVS</button>
             <button id="make-obstacles" onclick="toggleMakeObstacles(event)">MAKE OBSTACLES</button>
             <button id="marquee-button" onclick="toggleMarquee(event)">MARQUEE</button>
-            <button id="set-path-button" onclick="startSetWaypoints(event)">SET WAYPOINTS</button>
-            <button id="rebuild-board" onclick="rebuildBoard(event)">REBUILD BOARD</button>
-            <button id="rebuild-board" onclick="setWaypointsFromItems(event)">SET WPs BY ITEMS</button>
+            <button id="create-distance-lookup" onclick="(event)">CREATE DISTANCE LOOKUP FOR CURRENT BOARD</button>
+            <button id="set-start-tile" onclick="(event)">SET START TILE</button>
+            <button id="set-end-tile" onclick="(event)">SET END TILE</button>
             <div>
                 <input type="text" name="item" id="item-input" maxlength="90" size="60">
                 <button id="add-item" onclick="setItemLocation(event)">ADD GROCERY ITEM</button>    
             </div>
             
         </div>
+
         <div id="output-container">
             <button id="board-data-button" onclick="toggleOutput(event)">OPEN BOARD OUTPUT</button>
             <button id="inventory-data-button" onclick="toggleOutput(event)">OPEN INVENTORY OUTPUT</button>
@@ -59,6 +70,7 @@
                 
             </div>
         </div>
+        
         <script>
             console.log("hello from index.html");
         </script>

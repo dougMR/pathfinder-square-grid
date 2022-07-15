@@ -8,6 +8,9 @@
 //     grid = buildGrid(cols, rows, tileSize);
 //     setNeighbors(grid);
 // };
+
+const setStartTileButton = document.getElementById('set-start-tile');
+const setEndTileButton = document.getElementById('set-end-tile');
 const itemInput = document.getElementById("item-input");
 console.log(itemInput);
 let settingItemLocation = false;
@@ -72,19 +75,22 @@ const startSetWaypoints = (evt) => {
               sort the in-between tiles to shrotest path from start to end
 
             */
-            const orderedWPs = orderByClosest(waypoints);
+           const orderedWPs = getShortestRouteByClosest(waypoints);
+            // const orderedWPs = orderWaypointsByClosest(waypoints);
+            // const orderedWPs = getShortestRoute(waypoints);
+            // const orderedWPs = tspShortestByMutation(waypoints);
             // Need at least 2 waypoints to draw path
             console.log("orderedWaypoints: ", orderedWPs);
             for (let wp = 0; wp < orderedWPs.length - 1; wp++) {
-                console.log("wp index: ", wp);
-                console.log(
-                    "orderedWPs[wp]: ",
-                    orderedWPs[wp]
-                );
-                console.log(
-                    "orderedWPs[wp + 1]: ",
-                    orderedWPs[wp + 1]
-                );
+                // console.log("wp index: ", wp);
+                // console.log(
+                //     "orderedWPs[wp]: ",
+                //     orderedWPs[wp]
+                // );
+                // console.log(
+                //     "orderedWPs[wp + 1]: ",
+                //     orderedWPs[wp + 1]
+                // );
                 const path = drawPathAtoB(
                     orderedWPs[wp],
                     orderedWPs[wp + 1]
@@ -117,9 +123,10 @@ const startSetWaypoints = (evt) => {
     }
 };
 const setWaypoint = (tile, isStartPoint = false) => {
+    console.log('setWaypoint: ',tile);
     // Set Tilebutton color
     const tileButton = getTileButtonByIndices(tile.col,tile.row);
-    // console.log(`tileButton ${tile.col} ${tile.row}: ${tileButton}`);
+    console.log(`tileButton ${tile.col} ${tile.row}: ${tileButton}`);
 
     tileButton.classList.add("waypoint");
     if (isStartPoint) {
@@ -136,12 +143,12 @@ const setWaypointsFromItems = (event) => {
         const tile = getTileByIndices(item.loc.x,item.loc.y);
         setWaypoint(tile);
     }
-    // Store Entrance
-    const startTile = getTileByIndices(42,43);
-    setWaypoint(startTile,true);
-    // Checkout
-    const endTile = getTileByIndices(25,35);
-    setWaypoint(endTile);
+    // // Store Entrance
+    // const startTile = getTileByIndices(42,43);
+    // setWaypoint(startTile,true);
+    // // Checkout
+    // const endTile = getTileByIndices(25,35);
+    // setWaypoint(endTile);
 };
 const toggleOutput = (evt) => {
     outputOpen = !outputOpen;
@@ -204,7 +211,7 @@ const makeTileButton = (tile) => {
     }
     gridHolderDiv.appendChild(newButton);
 
-    newButton.addEventListener("mousedown", (evt) => {
+    newButton.addEventListener("pointerdown", (evt) => {
         // console.log(
         //     "MY SQUARE: ",
         //     evt.target.myTile.col,
@@ -232,6 +239,7 @@ const makeTileButton = (tile) => {
             // Show marquee
             marqueeDiv.classList.add("on");
         } else if (setObstaclesOn) {
+            console.log('touching tile, in PF-UI');
             toggleObstacle(evt.target.myTile);
             addingObstacles = evt.target.myTile.obstacle;
         } else {
@@ -239,7 +247,7 @@ const makeTileButton = (tile) => {
             maybeDrawPath(evt.target.myTile);
         }
     });
-    newButton.addEventListener("mousemove", (evt) => {
+    newButton.addEventListener("pointermove", (evt) => {
         // TODO: Move a lot into drag() function
         mousePos = getMouseXY(evt);
         if (dragging) {
@@ -251,7 +259,7 @@ const makeTileButton = (tile) => {
             }
         }
     });
-    newButton.addEventListener("mouseup", (evt) => {
+    newButton.addEventListener("pointerup", (evt) => {
         console.log("MOUSE UP");
         // TODO: Move a lot into stopDrag() function
         dragging = false;
@@ -326,6 +334,10 @@ const getMouseXY = (evt) => {
     return { x, y };
 };
 const getTileButtonByIndices = (col,row) => {
+    console.log('getTileButtonByIndices: ',col,row);
+    console.log( document.querySelector(
+        `[data-col="${col}"][data-row="${row}"]`
+    ));
     return document.querySelector(
         `[data-col="${col}"][data-row="${row}"]`
     );

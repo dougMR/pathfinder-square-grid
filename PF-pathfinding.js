@@ -6,28 +6,27 @@ const findPathFromAtoB = (A, B) => {
     // Find Path from tile A to tile B
     // Returns Array of segments, or null
 
-    
-    console.log(
-        "findPathFromAtoB(",
-        A.col,
-        ",",
-        A.row,
-        ", ",
-        B.col,
-        ",",
-        B.row,
-        ")"
-    );
+    // console.log(
+    //     "findPathFromAtoB(",
+    //     A.col,
+    //     ",",
+    //     A.row,
+    //     ", ",
+    //     B.col,
+    //     ",",
+    //     B.row,
+    //     ")"
+    // );
 
     // start from A, get segs to all neighbors
     A.endSegment = makeSegment(A, A);
-    
+
     // Keep track of all the segments we put down last iteration
     const lastSegs = [A.endSegment];
 
     // Handle case A === B
     if (A === B) {
-        return(lastSegs);
+        return lastSegs;
     }
 
     let foundTarget = false;
@@ -99,8 +98,7 @@ const findPathFromAtoB = (A, B) => {
                         const notCrossedOver =
                             !preNeighbor.endSegment ||
                             !postNeighbor.endSegment ||
-                            (preNeighbor.endSegment.fromTile !==
-                                postNeighbor &&
+                            (preNeighbor.endSegment.fromTile !== postNeighbor &&
                                 postNeighbor.endSegment.fromTile !==
                                     preNeighbor);
                         // console.log(
@@ -154,8 +152,11 @@ const findPathFromAtoB = (A, B) => {
                         // is nextNeighbor tile B?
                         if (nextNeighbor === B) {
                             // console.log("Found Target!");
-
+                            //
+                            // **************
                             // Found Target!
+                            // **************
+                            //
                             foundTarget = true;
                             const fullPath = getFullPathFromEndSegment(newSeg);
                             // clearPaths();
@@ -180,7 +181,7 @@ const findPathFromAtoB = (A, B) => {
         // console.log(`newSegs.length: ${newSegs.length}`);
         if (newSegs.length === 0) {
             noNewSegs = true;
-            console.log("No New Segs");
+            // console.log("No New Segs");
             break;
         } else {
             // console.log(">> lastSegs.length: ", lastSegs.length, " <<");
@@ -189,15 +190,15 @@ const findPathFromAtoB = (A, B) => {
             lastSegs.push(...newSegs);
         }
         // iterations++;
-    // } while (!foundTarget && iterations < 2000 && !noNewSegs);
-} while (!foundTarget && !noNewSegs);
+        // } while (!foundTarget && iterations < 2000 && !noNewSegs);
+    } while (!foundTarget && !noNewSegs);
     // console.log("iterations: ", iterations);
     return null;
 };
 
 const drawPathAtoB = (Atile, Btile, drawThisPathOnly = false) => {
     // Find path AtoB and draw it
-    
+
     const myPath = findPathFromAtoB(Atile, Btile);
     if (!myPath) {
         console.log("Can't get there from here");
@@ -238,16 +239,34 @@ const drawSegment = (segment, color) => {
     // Get tile center on canvas
     const h0coord = getTileCenterOnCanvas(segment.fromTile);
     const h1coord = getTileCenterOnCanvas(segment.toTile);
+    const strokeWidth = Math.ceil(tileSize * 0.1);
+    const headlen = strokeWidth * 2;
     ctx.beginPath();
     ctx.moveTo(h0coord.x, h0coord.y);
     ctx.lineTo(h1coord.x, h1coord.y);
+
+    // arrow head
+    var angle = Math.atan2(h1coord.y - h0coord.y, h1coord.x - h0coord.x);
+    // ctx.moveTo(tox, toy);
+    // path from corner of head to arrow tip
+    ctx.moveTo(
+        h1coord.x - headlen * Math.cos(angle - Math.PI / 7),
+        h1coord.y - headlen * Math.sin(angle - Math.PI / 7)
+    );
+    ctx.lineTo(h1coord.x, h1coord.y);
+    //path from the tip of arrow to the other side point
+    ctx.lineTo(
+        h1coord.x - headlen * Math.cos(angle + Math.PI / 7),
+        h1coord.y - headlen * Math.sin(angle + Math.PI / 7)
+    );
+
     ctx.closePath();
     if (color) {
-        ctx.lineWidth = 8;
+        ctx.lineWidth = strokeWidth *3;
         ctx.strokeStyle = "rgba(0,0,0,0.6)";
         ctx.stroke();
     }
-    ctx.lineWidth = 4;
+    ctx.lineWidth = strokeWidth;
     ctx.strokeStyle = color ? color : pink;
     ctx.stroke();
 };
@@ -287,21 +306,23 @@ const getFullPathFromEndSegment = (endSeg) => {
 
 /* WAYPOINTS */
 const orderWaypointsByClosest = (waypoints) => {
-    console.log('orderWaypointsByClosest()',waypoints);
+    // This assumes startWP and endWP are already in waypoints
+    console.log("orderWaypointsByClosest()", waypoints);
     const orderedWPs = [];
     const unorderedWPs = [...waypoints];
     // pull out first WP as startWP, put it in orderedWPs
     let startWP = unorderedWPs.splice(0, 1)[0];
     orderedWPs.push(startWP);
     let tooMuch = 0;
+    let nextWP = startWP;
     while (unorderedWPs.length > 1 && tooMuch < 100) {
         // find closest WP of unorderedWPs to startWP
-        const closestWP = getClosestWaypoint(startWP, unorderedWPs);
+        const closestWP = getClosestWaypoint(nextWP, unorderedWPs);
         // console.log(`closestWP: ${closestWP.col}, ${closestWP.row}`);
         // make that startWP, pull it from unorderedWPs, push it to orderedWPs
-        startWP = closestWP;
-        unorderedWPs.splice(unorderedWPs.indexOf(startWP), 1);
-        orderedWPs.push(startWP);
+        nextWP = closestWP;
+        unorderedWPs.splice(unorderedWPs.indexOf(nextWP), 1);
+        orderedWPs.push(nextWP);
         // repeat until unorderedWPs has only 1 left, then push that to orderedWPs
         tooMuch++;
     }
@@ -313,7 +334,7 @@ const orderWaypointsByClosest = (waypoints) => {
 };
 
 const getClosestWaypoint = (Awp, Barray) => {
-    console.log('getClosestWaypoint()');
+    console.log("getClosestWaypoint()");
     console.log(Awp);
     console.log(Barray);
     // params: button, button array
@@ -323,14 +344,9 @@ const getClosestWaypoint = (Awp, Barray) => {
     const distances = [];
     for (let b = 0; b < Barray.length; b++) {
         const path = findPathFromAtoB(Awp, Barray[b]);
-        console.log('path: ',path);
+        console.log("path: ", path);
         // console.log('path.length: ',path.length);
-        let dist = path.length;
-        for (const segment of path) {
-            if (segment.isDiagonal) {
-                dist += 0.4; // difference of hypotenuse and side length
-            }
-        }
+        const dist = getPathDistance(path);
         distances.push(dist);
     }
     const min = Math.min(...distances);
@@ -338,18 +354,77 @@ const getClosestWaypoint = (Awp, Barray) => {
     return Barray[index];
 };
 
+const getPathDistance = (path) => {
+    // Dist is in Segments
+    // diagonal Segments count as 1.4 Segments
+    let dist = path.length;
+    for (const segment of path) {
+        if (segment.isDiagonal) {
+            dist += 0.4; // difference of hypotenuse and side length
+        }
+    }
+    return dist;
+};
+
+const getShortestRouteByClosest = (tiles) => {
+
+    const orderedWPs = [entranceTile];
+    const unorderedWPs = [...tiles];
+    let tooMuch = 0;
+    let nextWP = entranceTile;
+    while (unorderedWPs.length > 0 && tooMuch < 100) {
+        // find closest WP of unorderedWPs to nextWP
+        // make that nextWP, pull it from unorderedWPs, push it to orderedWPs
+        nextWP = getClosestWaypoint(nextWP, unorderedWPs);
+        unorderedWPs.splice(unorderedWPs.indexOf(nextWP), 1);
+        orderedWPs.push(nextWP);
+        tooMuch++;
+    }
+    orderedWPs.push(endWP);
+    return orderedWPs;
+}
+
 const getShortestRoute = (tiles) => {
+    // THis gets each next closest tile, starting from start and end, then sticking result paths together
+    
     // tiles is an array of points
     // returns an array of tiles in optimized order
     // first and last tiles remain first and last
 
-    let shortestDistance = Infinity;
-    // compare all permutations
-    // as each leg is added, compare total dist to shortest dist.
-    // if it's longer, stop measuring that pattern.
+    //Start with start and end points,
+    //alternate between them, getting each next closest point,
+    //until all points are taken,
+    // then connect the two end points
 
+ 
 
-}
+    const orderedWPfromStart = [entranceTile];
+    const orderedWPfromEnd = [endWP];
+    const unorderedWPs = [...tiles];
+    let tooMuch = 0;
+    let nextWP = entranceTile;
+    while (unorderedWPs.length > 0 && tooMuch < 100) {
+        // find closest WP of unorderedWPs to nextWP
+        // make that nextWP, pull it from unorderedWPs, push it to orderedWPs
+        nextWP = getClosestWaypoint(nextWP, unorderedWPs);
+        unorderedWPs.splice(unorderedWPs.indexOf(nextWP), 1);
+        orderedWPfromStart.push(nextWP);
+        // Do the same from endWP
+        if (unorderedWPs.length > 1) {
+            endWP = getClosestWaypoint(endWP, unorderedWPs);
+            unorderedWPs.splice(unorderedWPs.indexOf(endWP), 1);
+            orderedWPfromEnd.push(endWP);
+        } else if (unorderedWPs.length > 0) {
+            orderedWPfromEnd.push(unorderedWPs[0]);
+        }
+        tooMuch++;
+    }
+    // Reverse orderedWPfromEnd, and add it to the end of orderedWPfromStart
+    orderedWPfromEnd.reverse();
+    orderedWPs = [...orderedWPfromStart, ...orderedWPfromEnd];
+    // returned ordered list
+    return orderedWPs;
+};
 
 /* END WAYPOINTS */
 

@@ -1,3 +1,9 @@
+// Store Entrance // Checkout
+let entranceTile, checkoutTile;
+// let startWP = getTileByIndices(42, 43);
+
+// let endWP = getTileByIndices(25, 35);
+
 console.log("hello from pathfinding.js");
 const canvas = document.getElementById("drawing-board");
 const ctx = canvas.getContext("2d");
@@ -16,6 +22,7 @@ const degToRad = (degree) => {
 const angleRad = degToRad(60);
 
 const setCanvasDimensions = () => {
+    // canvas (#drawing-board) is set to 100% width and height
     const w = canvas.offsetWidth;
     const h = canvas.offsetHeight;
     canvas.setAttribute("width", w);
@@ -94,8 +101,9 @@ const waypoints = [];
 const paths = [];
 
 // END HTML BUTTON FUNCTIONS
-
-let tileSize = 20;
+// let granularity = 50;
+const startNumColumns = 80;
+let tileSize = canvas.offsetWidth / startNumColumns;
 let numRows, numColumns;
 function init() {
     console.log("init()");
@@ -103,13 +111,12 @@ function init() {
     setCanvasDimensions();
     numColumns = Math.floor(canvas.offsetWidth / tileSize);
     numRows = Math.floor(canvas.offsetHeight / tileSize);
-    // tileSize = Math.round(canvas.offsetWidth / numColumns);
+    tileSize = Math.round(canvas.offsetWidth / numColumns);
     // grid = buildGrid(numColumns, numRows);
-    grid = buildGridFromData(gridData);
+    // grid = buildGridFromData(gridData);
+    grid = buildGridFromData(jamesStGridData);
     setNeighbors(grid);
-    const diagonal = Math.sqrt(
-        tileSize * tileSize + tileSize * tileSize
-    );
+    const diagonal = Math.sqrt(tileSize * tileSize + tileSize * tileSize);
     console.log("diagonal ratio: ", (diagonal - tileSize) / tileSize);
     // console.log(grid[17][5].neighbors[1] === null);
     console.log(
@@ -120,10 +127,18 @@ function init() {
     );
     resizeGrid();
     makeCanvasHandlers();
+    // createLookupForCurrentMap();
+    console.log(
+        `All to All: ${getLengthOfAllToAll(grid.length).toLocaleString(
+            "en",
+            "US"
+        )} ways...`
+    );
 }
 
 const makeCanvasHandlers = () => {
     const startTouchCanvas = (evt) => {
+        // console.log('startTouchCanvas: ', evt);
         const mouseXY = getMouseXY(evt);
         const thisTile = getTileByCoordinates(mouseXY.x, mouseXY.y);
         // Setting Item location
@@ -145,6 +160,7 @@ const makeCanvasHandlers = () => {
             // Show marquee
             marqueeDiv.classList.add("on");
         } else if (setObstaclesOn) {
+            console.log("startTouchCanvas, tile: ", thisTile);
             toggleObstacle(thisTile);
             addingObstacles = thisTile.obstacle;
         } else {
@@ -159,7 +175,7 @@ const makeCanvasHandlers = () => {
         if (dragging) {
             if (marqueeOn) {
                 drawMarquee();
-                
+
                 currentDragTile = thisTile;
             } else if (setObstaclesOn) {
                 setObstacle(thisTile, addingObstacles);
@@ -174,15 +190,14 @@ const makeCanvasHandlers = () => {
         }
     };
     // Start touch
-    canvas.addEventListener("touchstart", startTouchCanvas);
-    canvas.addEventListener("mousedown", startTouchCanvas);
+    canvas.addEventListener("pointerdown", startTouchCanvas);
+    // canvas.addEventListener("mousedown", startTouchCanvas);
     // Move
-    canvas.addEventListener("touchmove",moveOverCanvas)
-    canvas.addEventListener("mousemove",moveOverCanvas)
+    canvas.addEventListener("pointermove", moveOverCanvas);
+    // canvas.addEventListener("mousemove",moveOverCanvas)
     // End touch
-    canvas.addEventListener("touchend",endTouchCanvas);
-    canvas.addEventListener("mouseup",endTouchCanvas);
-
+    canvas.addEventListener("pointerup", endTouchCanvas);
+    // canvas.addEventListener("mouseup",endTouchCanvas);
 };
 
 window.addEventListener("load", (evt) => {

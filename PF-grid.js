@@ -24,11 +24,13 @@ const drawTile = (tile) => {
 };
 
 const getTileByIndices = (colIndex, rowIndex) => {
+    // console.log("colIndex, RowIndex: ",colIndex,rowIndex);
     // ?? Any reason for this function, when we can just get it directly from grid[colIndex][rowIndex]?
     return grid[colIndex][rowIndex];
 };
 
 const getTileByCoordinates = (x, y) => {
+    // console.log('getTileByCoordinates: ',x,y);
     const col = Math.floor(x / tileSize);
     const row = Math.floor(y / tileSize);
     return getTileByIndices(col, row);
@@ -96,6 +98,7 @@ const recalcTileSize = () => {
 };
 
 const getTileCenterOnCanvas = (tile) => {
+    // console.log('getTileCenterOnCanvas: ',tile);
     const x = tileSize * tile.col + tileSize * 0.5;
     const y = tileSize * tile.row + tileSize * 0.5;
     return { x, y };
@@ -187,7 +190,7 @@ function drawTileOnCanvas(tile) {
 
 function redrawGrid(keepPaths = false) {
     // Re-draws grid
-    console.log("redrawGrid(" + keepPaths + ")");
+    // console.log("redrawGrid(" + keepPaths + ")");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (const col of grid) {
         for (const tile of col) {
@@ -204,7 +207,7 @@ function redrawGrid(keepPaths = false) {
         }
     }
     if (keepPaths) {
-        console.log("paths.length", paths.length);
+        // console.log("paths.length", paths.length);
         for (const path of paths) {
             drawPath(path);
         }
