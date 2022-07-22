@@ -6,17 +6,21 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Pathfinding - grid, canvas</title>
         <link rel="stylesheet" href="style.css" />
-        <script src="./JamesStWegmans.js" defer></script>
+        <script src="./stores-dummy-data.js"></script>
+        <script src="./inventories-dummy-data.js"></script>
         <script src="./PF-index.js" defer></script>
         <script src="./PF-grid.js" defer></script>
+        <script src="./data-calls.js" defer></script>        
         <script src="./PF-pathfinding.js" defer></script>
-        <script src="./grid-data.js"></script>
+        <!-- <script src="./grid-data.js"></script> -->
         <script src="./PF-UI.js" defer></script>
         <script src="./PF-marquee-select.js" defer></script>
-        <script src="./inventory.js"></script>
         <script src="./PF-TSP-mutation.js" defer></script>
         <script src="./PF-dist-lookup.js" defer></script>
         <script src="./PF-math.js"></script>
+        <script src="./map-zoom-pan.js" defer></script>
+        <script src="./init.js" defer></script>
+        
         <!-- <script src="pathfinding.js" type="module">
             // import * as PF from "./pathfinding.js";
         </script> -->
@@ -33,46 +37,95 @@
     <body>
         <!-- <button id="say-it" onclick="sayIt('MODULES ROCK')">SAY IT</button> -->
         <h1>Grid Pathfinding</h1>
+        <!-- MAP -->
         <div id="canvas-holder">
             <div id="tile-buttons-holder"></div>
             <canvas id="drawing-board"> </canvas>
             <!-- <img src="./images/grocery-store-layout.png" alt="grocery store map" id="map"> -->
-            <img src="./images/JamesStWegmans_floorplan.jpg" alt="grocery store map" id="map">
+            <img
+                src="./images/JamesStWegmans_floorplan.jpg"
+                alt="grocery store map"
+                id="map-img"
+            />
             <div id="marquee"></div>
         </div>
-        
+        <!-- ZOOM SLIDER -->
+        <input
+            type="range"
+            min="1"
+            max="3"
+            step="0.1"
+            value="1"
+            class="slider"
+            id="zoom-range"
+        />
+
         <div>
             <!-- Buttons for testing -->
             <!-- <button id="rebuild-board" onclick="rebuildBoard(event)">REBUILD BOARD</button> -->
-            <button id="set-path-button" onclick="startSetWaypoints(event)">SET WAYPOINTS</button>
-            <button id="rebuild-board" onclick="setWaypointsFromItems(event)">SET WPs BY ITEMS</button>
+            <button id="set-path-button" onclick="startSetWaypoints(event)">
+                SET WAYPOINTS
+            </button>
+            <button id="rebuild-board" onclick="setWaypointsFromItems(event)">
+                SET WPs BY ITEMS
+            </button>
             <button onclick="clearPaths()">CLEAR PATHS</button>
 
-            <br/><br/>
+            <br /><br />
             <button onclick="toggleTileButtons()">TOGGLE TILE DIVS</button>
-            <button id="make-obstacles" onclick="toggleMakeObstacles(event)">MAKE OBSTACLES</button>
-            <button id="marquee-button" onclick="toggleMarquee(event)">MARQUEE</button>
-            <button id="create-distance-lookup" onclick="(event)">CREATE DISTANCE LOOKUP FOR CURRENT BOARD</button>
-            <button id="set-start-tile" onclick="(event)">SET START TILE</button>
+            <button id="make-obstacles" onclick="toggleMakeObstacles(event)">
+                MAKE OBSTACLES
+            </button>
+            <button id="marquee-button" onclick="toggleMarquee(event)">
+                MARQUEE
+            </button>
+            <button id="create-distance-lookup" onclick="(event)">
+                CREATE DISTANCE LOOKUP FOR CURRENT BOARD
+            </button>
+            <button id="set-start-tile" onclick="(event)">
+                SET START TILE
+            </button>
             <button id="set-end-tile" onclick="(event)">SET END TILE</button>
             <div>
-                <input type="text" name="item" id="item-input" maxlength="90" size="60">
-                <button id="add-item" onclick="setItemLocation(event)">ADD GROCERY ITEM</button>    
+                <button id="clear-items" onclick="clearItems(event)">
+                    CLEAR GROCERY ITEMS
+                </button>
+                <input
+                    type="text"
+                    name="item"
+                    id="item-input"
+                    maxlength="90"
+                    minlength="40"
+                    size="40"
+                />
+                <button id="add-item" onclick="setItemLocation(event)">
+                    ADD GROCERY ITEM
+                </button>
             </div>
-            
         </div>
 
         <div id="output-container">
-            <button id="board-data-button" onclick="toggleOutput(event)">OPEN BOARD OUTPUT</button>
-            <button id="inventory-data-button" onclick="toggleOutput(event)">OPEN INVENTORY OUTPUT</button>
-            <button id="copy-output-button" onclick="copyOutput(event)">COPY OUTPUT</button>
-            <div id="output">
-                
-            </div>
+            <button id="board-data-button" onclick="toggleOutput(event)">
+                OPEN BOARD OUTPUT
+            </button>
+            <button id="inventory-data-button" onclick="toggleOutput(event)">
+                OPEN INVENTORY OUTPUT
+            </button>
+            <button id="copy-output-button" onclick="copyOutput(event)">
+                COPY OUTPUT
+            </button>
+            <div id="output"></div>
         </div>
-        
+
+        <style>
+            #canvas-holder {
+                overflow: hidden;
+            }
+        </style>
         <script>
             console.log("hello from index.html");
+
+            
         </script>
     </body>
 </html>

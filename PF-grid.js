@@ -1,8 +1,9 @@
 /* GRID INTERACTION */
+console.log("hello from grid.js");
 
 const drawTile = (tile) => {
-    // const x = tileSize * tile.col + tileSize * 0.5;
-    // const y = tileSize * tile.row + tileSize * 0.5;
+    // const x = currentStore.tileSize * tile.col + currentStore.tileSize * 0.5;
+    // const y = currentStore.tileSize * tile.row + currentStore.tileSize * 0.5;
     let x, y;
     ({ x, y } = getTileCenterOnCanvas(tile));
 
@@ -10,7 +11,7 @@ const drawTile = (tile) => {
 
     // // Draw center dot
     // ctx.beginPath();
-    // const radius = tileSize * 0.1;
+    // const radius = currentStore.tileSize * 0.1;
     // ctx.arc(x, y, radius, 0, 2 * Math.PI);
     // ctx.fillStyle = "yellow";
     // ctx.fill();
@@ -18,21 +19,22 @@ const drawTile = (tile) => {
     // Draw coordinate
     const xyString = `${tile.col}, ${tile.row}`;
     const textSize = ctx.measureText(xyString);
-    ctx.font = `${tileSize * 0.3}px sans-serif`;
+    ctx.font = `${currentStore.tileSize * 0.3}px sans-serif`;
     ctx.fillStyle = tile.obstacle ? "white" : "black";
     ctx.fillText(xyString, x - textSize.width / 2, y + 3);
 };
 
 const getTileByIndices = (colIndex, rowIndex) => {
     // console.log("colIndex, RowIndex: ",colIndex,rowIndex);
-    // ?? Any reason for this function, when we can just get it directly from grid[colIndex][rowIndex]?
-    return grid[colIndex][rowIndex];
+    // ?? Any reason for this function, when we can just get it directly from currentStore.grid[colIndex][rowIndex]?
+    return currentStore.grid[colIndex][rowIndex];
 };
 
 const getTileByCoordinates = (x, y) => {
     // console.log('getTileByCoordinates: ',x,y);
-    const col = Math.floor(x / tileSize);
-    const row = Math.floor(y / tileSize);
+    // console.log('currentStore.tileSize: ',currentStore.tileSize);
+    const col = Math.floor(x / currentStore.tileSize);
+    const row = Math.floor(y / currentStore.tileSize);
     return getTileByIndices(col, row);
 };
 
@@ -42,10 +44,10 @@ const getNeighborTiles = (tile) => {
     const y = tile.row;
     const neighbors = [];
     const add = (col, row) => {
-        if (col < 0 || col >= grid.length || row < 0 || row >= numRows) {
+        if (col < 0 || col >= currentStore.grid.length || row < 0 || row >= numRows) {
             neighbors.push(null);
         } else {
-            neighbors.push(grid[col][row]);
+            neighbors.push(currentStore.grid[col][row]);
         }
     };
     // Above (0)
@@ -94,13 +96,13 @@ const buildGrid = (numColumns, numRows) => {
 };
 
 const recalcTileSize = () => {
-    tileSize = canvas.offsetWidth / numColumns;
+    currentStore.tileSize = mapCanvas.offsetWidth / numColumns;
 };
 
 const getTileCenterOnCanvas = (tile) => {
     // console.log('getTileCenterOnCanvas: ',tile);
-    const x = tileSize * tile.col + tileSize * 0.5;
-    const y = tileSize * tile.row + tileSize * 0.5;
+    const x = currentStore.tileSize * tile.col + currentStore.tileSize * 0.5;
+    const y = currentStore.tileSize * tile.row + currentStore.tileSize * 0.5;
     return { x, y };
 };
 
@@ -109,7 +111,7 @@ const buildGridFromData = (gridData) => {
     // const tileSize = gridData.tileSize;
     numColumns = gridData.numColumns;
     numRows = gridData.numRows;
-    // tileSize = canvas.offsetWidth / numCols;
+    // tileSize = mapCanvas.offsetWidth / numCols;
     recalcTileSize();
     // console.log('tileSize: ',tileSize);
     // console.log("data.grid.length: ",gridData.grid.length);
@@ -120,7 +122,7 @@ const buildGridFromData = (gridData) => {
         for (let row = 0; row < gridData.grid[col].length; row++) {
             // Create Tiles
             const tile = {
-                size: tileSize,
+                size: gridData.tileSize,
                 // diagonal,
                 col,
                 row,
@@ -150,9 +152,9 @@ const setNeighbors = (grid) => {
 };
 
 function drawTileOnCanvas(tile) {
-    const half = tileSize * 0.5;
-    let x = tile.col * tileSize + half;
-    let y = tile.row * tileSize + half;
+    const half = currentStore.tileSize * 0.5;
+    let x = tile.col * currentStore.tileSize + half;
+    let y = tile.row * currentStore.tileSize + half;
     ctx.beginPath();
     ctx.moveTo(x - half, y - half);
     ctx.lineTo(x + half, y - half);
@@ -169,7 +171,7 @@ function drawTileOnCanvas(tile) {
     }
     // Draw Stroke
     ctx.strokeStyle = "rgba(0,0,0,0.85)";
-    ctx.lineWidth = Math.min(tileSize * 0.1, "0.25");
+    ctx.lineWidth = Math.min(currentStore.tileSize * 0.1, "0.25");
     ctx.stroke();
 
     if (!tile.obstacle) {
@@ -191,8 +193,8 @@ function drawTileOnCanvas(tile) {
 function redrawGrid(keepPaths = false) {
     // Re-draws grid
     // console.log("redrawGrid(" + keepPaths + ")");
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (const col of grid) {
+    ctx.clearRect(0, 0, mapCanvas.width, mapCanvas.height);
+    for (const col of currentStore.grid) {
         for (const tile of col) {
             drawTile(tile);
             if (keepPaths && tile.endSegment) {
@@ -214,7 +216,7 @@ function redrawGrid(keepPaths = false) {
     }
     // for (let col = 0; col < numColumns - 1; col++) {
     //     for (let row = 0; row < numRows - 1; row++) {
-    //         drawTileOnCanvas(grid[col][row]);
+    //         drawTileOnCanvas(currentStore.grid[col][row]);
     //     }
     // }
 }

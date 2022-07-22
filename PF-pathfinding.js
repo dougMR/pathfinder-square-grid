@@ -1,3 +1,5 @@
+console.log("hello from pathfinding.js");
+
 /* PATHFINDING */
 // A path is an array of segments
 
@@ -54,6 +56,7 @@ const findPathFromAtoB = (A, B) => {
             //     `   ==== neighbors for ${lastSeg.toTile.col}, ${lastSeg.toTile.row}`
             // );
             const increment = 1;
+            // console.log("lastSeg: ", lastSeg);
             for (
                 let n = 0;
                 n < lastSeg.toTile.neighbors.length;
@@ -62,7 +65,14 @@ const findPathFromAtoB = (A, B) => {
                 const nextN = clockwise
                     ? n
                     : lastSeg.toTile.neighbors.length - n - increment;
+
                 nextNeighbor = lastSeg.toTile.neighbors[nextN];
+                if (nextNeighbor != null) {
+                    const col = lastSeg.toTile.neighbors[nextN].col;
+                    const row = lastSeg.toTile.neighbors[nextN].row;
+                    nextNeighbor = getTileByIndices(col, row);
+                }
+
                 // console.log(nextNeighbor);
                 if (
                     nextNeighbor != null &&
@@ -198,7 +208,6 @@ const findPathFromAtoB = (A, B) => {
 
 const drawPathAtoB = (Atile, Btile, drawThisPathOnly = false) => {
     // Find path AtoB and draw it
-
     const myPath = findPathFromAtoB(Atile, Btile);
     if (!myPath) {
         console.log("Can't get there from here");
@@ -262,7 +271,7 @@ const drawSegment = (segment, color) => {
 
     ctx.closePath();
     if (color) {
-        ctx.lineWidth = strokeWidth *3;
+        ctx.lineWidth = strokeWidth * 3;
         ctx.strokeStyle = "rgba(0,0,0,0.6)";
         ctx.stroke();
     }
@@ -367,11 +376,11 @@ const getPathDistance = (path) => {
 };
 
 const getShortestRouteByClosest = (tiles) => {
-
     const orderedWPs = [entranceTile];
     const unorderedWPs = [...tiles];
     let tooMuch = 0;
     let nextWP = entranceTile;
+    console.log('entranceTile: ',entranceTile);
     while (unorderedWPs.length > 0 && tooMuch < 100) {
         // find closest WP of unorderedWPs to nextWP
         // make that nextWP, pull it from unorderedWPs, push it to orderedWPs
@@ -382,11 +391,11 @@ const getShortestRouteByClosest = (tiles) => {
     }
     orderedWPs.push(endWP);
     return orderedWPs;
-}
+};
 
 const getShortestRoute = (tiles) => {
     // THis gets each next closest tile, starting from start and end, then sticking result paths together
-    
+
     // tiles is an array of points
     // returns an array of tiles in optimized order
     // first and last tiles remain first and last
@@ -395,8 +404,6 @@ const getShortestRoute = (tiles) => {
     //alternate between them, getting each next closest point,
     //until all points are taken,
     // then connect the two end points
-
- 
 
     const orderedWPfromStart = [entranceTile];
     const orderedWPfromEnd = [endWP];

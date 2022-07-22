@@ -10,27 +10,35 @@ h1 {
     position: relative;
     display: inline-block;
     width: 100%;
-    /* max-width: 600px; */
+    max-width: 800px;
     height: 100%;
     box-sizing: border-box;
     border: 2px solid purple;
     background-color: rgb(167, 255, 176);
+
+    user-select: none;
 }
 #tile-buttons-holder {
     pointer-events: none;
+    position: absolute;
+    z-index: 300;
 }
 #drawing-board {
     position: absolute;
     box-sizing: border-box;
-    border: 1px solid red;
-    width: calc(0px + 100%);
-    height: calc(0px + 100%);
+    /* border: 3px solid red; */
+    width: auto;
+    height: auto;
     /* Ultimately, we might use the canvas for all mouse events, so this may change */
     /* pointer-events: none; */
+    z-index: 200;
 }
-#canvas-holder > img {
+
+#canvas-holder > #map-img {
+    position: absolute;
     width: 100%;
     height: auto;
+    z-index: 100;
 }
 #marquee {
     display: none;
@@ -70,6 +78,39 @@ h1 {
     color: yellow;
     text-shadow: 0.1em 0.1em 0 black, -0.1em -0.1em 0 black,-0.1em 0.1em 0 black, 0.1em -0.1em 0 black;
 }
+
+/* SLIDER */
+.slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 25px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+  }
+  
+  .slider:hover {
+    opacity: 1;
+  }
+  
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    background: #04AA6D;
+    cursor: pointer;
+  }
+  
+  .slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    background: #04AA6D;
+    cursor: pointer;
+  }
+  /* END SLIDER */
 button.make-obstacles-on,
 button#marquee-button.on {
     background-color: mediumseagreen;
@@ -93,6 +134,7 @@ button#add-item.waiting {
     border: 2px solid #222;
     overflow-y: scroll;
     box-sizing: border-box;
+    z-index: 500;
 }
 #output {
     color: #222;

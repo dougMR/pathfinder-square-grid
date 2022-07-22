@@ -8,15 +8,21 @@
 //     grid = buildGrid(cols, rows, tileSize);
 //     setNeighbors(grid);
 // };
-
-const setStartTileButton = document.getElementById('set-start-tile');
-const setEndTileButton = document.getElementById('set-end-tile');
+let mousePos = { x: 0, y: 0 };
+const setStartTileButton = document.getElementById("set-start-tile");
+const setEndTileButton = document.getElementById("set-end-tile");
 const itemInput = document.getElementById("item-input");
-console.log(itemInput);
+// console.log(itemInput);
 let settingItemLocation = false;
 const setItemLocationButton = document.getElementById("add-item");
+const clearItems = (evt) => {
+    const clearItems = window.confirm(
+        "are you sure you want to clear all inventory items?"
+    );
+    if (clearItems) currentStore.inventory.length = 0;
+};
 const addItemToInventory = (name, x, y) => {
-    items.push({ name, loc: { x, y } });
+    currentStore.inventory.push({ name, loc: { x, y } });
 };
 const setItemLocation = (tile) => {
     console.log("setItemLocation: ", tile);
@@ -24,16 +30,23 @@ const setItemLocation = (tile) => {
     // Can be called from UI button or Tile button
     if (settingItemLocation) {
         if (tile != null) {
+            // Make sure tile has no other item in it
+            const inventoryInTile = currentStore.inventory.find((el) => {
+                el.col === tile.col && el.row === tile.row;
+            });
+            if (inventoryInTile) {
+                window.alert("Tile already has inventory item.");
+                return;
+            } else if (tile.obstacle) {
+                window.alert("Tile is obstructed.");
+                return;
+            }
             // Set item at location
-            addItemToInventory(
-                itemInput.value,
-                tile.col,
-                tile.row
-            );
+            addItemToInventory(itemInput.value, tile.col, tile.row);
             itemInput.value = "";
             setItemLocationButton.classList.remove("waiting");
             settingItemLocation = false;
-            console.log("items: ", items);
+            // console.log("currentStore.inventory: ", currentStore.inventory);
         } else {
             // location is null
             // pick location first
@@ -43,6 +56,7 @@ const setItemLocation = (tile) => {
             // start Setting location
             setItemLocationButton.classList.add("waiting");
             settingItemLocation = true;
+            // waiting to click a tile
         }
     }
 };
@@ -75,7 +89,7 @@ const startSetWaypoints = (evt) => {
               sort the in-between tiles to shrotest path from start to end
 
             */
-           const orderedWPs = getShortestRouteByClosest(waypoints);
+            const orderedWPs = getShortestRouteByClosest(waypoints);
             // const orderedWPs = orderWaypointsByClosest(waypoints);
             // const orderedWPs = getShortestRoute(waypoints);
             // const orderedWPs = tspShortestByMutation(waypoints);
@@ -91,10 +105,7 @@ const startSetWaypoints = (evt) => {
                 //     "orderedWPs[wp + 1]: ",
                 //     orderedWPs[wp + 1]
                 // );
-                const path = drawPathAtoB(
-                    orderedWPs[wp],
-                    orderedWPs[wp + 1]
-                );
+                const path = drawPathAtoB(orderedWPs[wp], orderedWPs[wp + 1]);
                 if (path) {
                     paths.push(path);
                     // clearPaths();
@@ -123,10 +134,10 @@ const startSetWaypoints = (evt) => {
     }
 };
 const setWaypoint = (tile, isStartPoint = false) => {
-    console.log('setWaypoint: ',tile);
+    // console.log("setWaypoint: ", tile);
     // Set Tilebutton color
-    const tileButton = getTileButtonByIndices(tile.col,tile.row);
-    console.log(`tileButton ${tile.col} ${tile.row}: ${tileButton}`);
+    const tileButton = getTileButtonByIndices(tile.col, tile.row);
+    // console.log(`tileButton ${tile.col} ${tile.row}: ${tileButton}`);
 
     tileButton.classList.add("waypoint");
     if (isStartPoint) {
@@ -138,9 +149,9 @@ const setWaypoint = (tile, isStartPoint = false) => {
 const setWaypointsFromItems = (event) => {
     if (!tileButtonsOn) createTileButtons();
     if (!settingWaypoints) startSetWaypoints();
-    for (const item of items) {
+    for (const item of currentStore.inventory) {
         // console.log("item: ", item);
-        const tile = getTileByIndices(item.loc.x,item.loc.y);
+        const tile = getTileByIndices(item.loc.x, item.loc.y);
         setWaypoint(tile);
     }
     // // Store Entrance
@@ -163,7 +174,7 @@ const toggleOutput = (evt) => {
             generateGridOutput();
         } else if (id === "inventory-data-button") {
             const itemsJson =
-                "<pre>" + JSON.stringify(items, null, 4) + "</pre>";
+                "<pre>" + JSON.stringify(currentStore.inventory, null, 4) + "</pre>";
             output(itemsJson);
         }
     } else {
@@ -183,7 +194,7 @@ const toggleMakeObstacles = () => {
 };
 
 const maybeDrawPath = (tile) => {
-    if(tile.obstacle)return;
+    if (tile.obstacle) return;
     if (!startTile) {
         // first tile clicked
         startTile = tile;
@@ -209,69 +220,69 @@ const makeTileButton = (tile) => {
     if (tile.obstacle) {
         newButton.classList.add("obstacle");
     }
-    gridHolderDiv.appendChild(newButton);
+    gridButtonsHolderDiv.appendChild(newButton);
 
-    newButton.addEventListener("pointerdown", (evt) => {
-        // console.log(
-        //     "MY SQUARE: ",
-        //     evt.target.myTile.col,
-        //     ", ",
-        //     evt.target.myTile.row
-        // );
-        // console.log("OCCUPIED: ", evt.target.myTile.obstacle);
-        // console.log("evt: ", evt);
-        // console.log("evt.clientY: ", evt.clientY);
-        if (settingItemLocation) {
-            if (itemInput.value != "") setItemLocation(evt.target.myTile);
-            return;
-        }
+    // newButton.addEventListener("pointerdown", (evt) => {
+    //     // console.log(
+    //     //     "MY SQUARE: ",
+    //     //     evt.target.myTile.col,
+    //     //     ", ",
+    //     //     evt.target.myTile.row
+    //     // );
+    //     // console.log("OCCUPIED: ", evt.target.myTile.obstacle);
+    //     // console.log("evt: ", evt);
+    //     // console.log("evt.clientY: ", evt.clientY);
+    //     if (settingItemLocation) {
+    //         if (itemInput.value != "") setItemLocation(evt.target.myTile);
+    //         return;
+    //     }
 
-        if (settingWaypoints && !evt.target.myTile.obstacle) {
-            setWaypoint(evt.target.myTile);
-            return;
-        }
-        // TODO: Move a lot into startDrag() function
-        // Start Drag
-        dragging = true;
-        startDragPos = getMouseXY(evt);
-        startDragTile = evt.target.myTile;
-        if (marqueeOn) {
-            // Show marquee
-            marqueeDiv.classList.add("on");
-        } else if (setObstaclesOn) {
-            console.log('touching tile, in PF-UI');
-            toggleObstacle(evt.target.myTile);
-            addingObstacles = evt.target.myTile.obstacle;
-        } else {
-            // Draw Path if !setObstaclesOn && !marqueeOn
-            maybeDrawPath(evt.target.myTile);
-        }
-    });
-    newButton.addEventListener("pointermove", (evt) => {
-        // TODO: Move a lot into drag() function
-        mousePos = getMouseXY(evt);
-        if (dragging) {
-            if (marqueeOn) {
-                drawMarquee();
-                currentDragTile = evt.target.myTile;
-            } else if (setObstaclesOn) {
-                setObstacle(evt.target.myTile, addingObstacles);
-            }
-        }
-    });
-    newButton.addEventListener("pointerup", (evt) => {
-        console.log("MOUSE UP");
-        // TODO: Move a lot into stopDrag() function
-        dragging = false;
-        // addingObstacles = true;
-        if (marqueeOn) {
-            marqueeDiv.classList.remove("on");
-            toggleMarqueedTiles();
-        }
-    });
+    //     if (settingWaypoints && !evt.target.myTile.obstacle) {
+    //         setWaypoint(evt.target.myTile);
+    //         return;
+    //     }
+    //     // TODO: Move a lot into startDrag() function
+    //     // Start Drag
+    //     dragging = true;
+    //     startDragPos = getMouseXY(evt);
+    //     startDragTile = evt.target.myTile;
+    //     if (marqueeOn) {
+    //         // Show marquee
+    //         marqueeDiv.classList.add("on");
+    //     } else if (setObstaclesOn) {
+    //         console.log("touching tile, in PF-UI");
+    //         toggleObstacle(evt.target.myTile);
+    //         addingObstacles = evt.target.myTile.obstacle;
+    //     } else {
+    //         // Draw Path if !setObstaclesOn && !marqueeOn
+    //         maybeDrawPath(evt.target.myTile);
+    //     }
+    // });
+    // newButton.addEventListener("pointermove", (evt) => {
+    //     // TODO: Move a lot into drag() function
+    //     mousePos = getMouseXY(evt);
+    //     if (dragging) {
+    //         if (marqueeOn) {
+    //             drawMarquee();
+    //             currentDragTile = evt.target.myTile;
+    //         } else if (setObstaclesOn) {
+    //             setObstacle(evt.target.myTile, addingObstacles);
+    //         }
+    //     }
+    // });
+    // newButton.addEventListener("pointerup", (evt) => {
+    //     console.log("MOUSE UP");
+    //     // TODO: Move a lot into stopDrag() function
+    //     dragging = false;
+    //     // addingObstacles = true;
+    //     if (marqueeOn) {
+    //         marqueeDiv.classList.remove("on");
+    //         toggleMarqueedTiles();
+    //     }
+    // });
+
     obstacleButtons.push(newButton);
 };
-
 
 const toggleTileButtons = (onOrOff) => {
     if (obstacleButtons.length > 0) {
@@ -328,17 +339,162 @@ const buttonFindPath = () => {
 };
 
 const getMouseXY = (evt) => {
-    var rect = gridHolderDiv.getBoundingClientRect();
+    // Relative to map, if map is evt target?
+    // var rect = gridButtonsHolderDiv.getBoundingClientRect();
+    var rect = mapImg.getBoundingClientRect();
     var x = evt.clientX - rect.left; //x position within the element.
     var y = evt.clientY - rect.top; //y position within the element.
     return { x, y };
 };
-const getTileButtonByIndices = (col,row) => {
-    console.log('getTileButtonByIndices: ',col,row);
-    console.log( document.querySelector(
-        `[data-col="${col}"][data-row="${row}"]`
-    ));
-    return document.querySelector(
-        `[data-col="${col}"][data-row="${row}"]`
-    );
-}
+
+const getTileButtonByIndices = (col, row) => {
+    // console.log("getTileButtonByIndices: ", col, row);
+    // console.log(
+    //     document.querySelector(`[data-col="${col}"][data-row="${row}"]`)
+    // );
+    return document.querySelector(`[data-col="${col}"][data-row="${row}"]`);
+};
+
+const makeMapCanvasHandlers = () => {
+    // Variables in here are available to nested functions
+    const dragMap = (x, y) => {
+        const xDist = x - startDragPos.x;
+        const yDist = y - startDragPos.y;
+        moveMap(xDist, yDist);
+    };
+    const startTouchCanvas = (evt) => {
+        // console.log('startTouchCanvas: ', evt);
+
+        const mouseXY = getMouseXY(evt);
+        const thisTile = getTileByCoordinates(mouseXY.x, mouseXY.y);
+        // Setting Item location
+        if (settingItemLocation) {
+            if (itemInput.value != "") setItemLocation(thisTile);
+            return;
+        }
+        // Setting Waypoint
+        if (settingWaypoints && !thisTile.obstacle) {
+            setWaypoint(thisTile);
+            return;
+        }
+        // Start Drag
+        dragging = true;
+        startDragPos = mouseXY;
+        console.log("startTouchCanvas, tile: ", thisTile);
+        startDragTile = thisTile;
+        if (marqueeOn) {
+            // Show marquee
+            marqueeDiv.classList.add("on");
+        } else if (setObstaclesOn) {
+            // Toggle obstacle
+            toggleObstacle(thisTile);
+            addingObstacles = thisTile.obstacle;
+        } else {
+            // Draw Path if !setObstaclesOn && !marqueeOn
+            maybeDrawPath(thisTile);
+        }
+    };
+    const moveOverCanvas = (evt) => {
+        // TODO: Move a lot into drag() function
+        mousePos = getMouseXY(evt);
+        const thisTile = getTileByCoordinates(mousePos.x, mousePos.y);
+        if (dragging) {
+            if (marqueeOn) {
+                drawMarquee();
+
+                currentDragTile = thisTile;
+            } else if (setObstaclesOn) {
+                setObstacle(thisTile, addingObstacles);
+            } else {
+                // Drag Map
+                dragMap(mousePos.x, mousePos.y);
+            }
+        }
+    };
+    const endTouchCanvas = (evt) => {
+        console.log("endTouchCanvas");
+        dragging = false;
+        if (marqueeOn) {
+            marqueeDiv.classList.remove("on");
+            toggleMarqueedTiles();
+        }
+    };
+    // const moveOutOfCanvas = (evt) => {
+    //     console.log("pointer moved out of map");
+    //     pointerInCanvas = false;
+    // }
+    // const moveIntoCanvas = (evt) => {
+    //     console.log("pointer moved into map");
+    //     pointerInCanvas = true;
+    // }
+    // Start touch
+    mapCanvas.addEventListener("pointerdown", startTouchCanvas);
+    // mapCanvas.addEventListener("mousedown", startTouchCanvas);
+    // Move
+    mapCanvas.addEventListener("pointermove", moveOverCanvas);
+    // mapCanvas.addEventListener("mousemove",moveOverCanvas)
+    // End touch
+    mapCanvas.addEventListener("pointerup", endTouchCanvas);
+    // mapCanvas.addEventListener("mouseup",endTouchCanvas);
+    // mapCanvas.addEventListener("pointerleave", moveOutOfCanvas);
+    // mapCanvas.addEventListener("pointerenter", moveIntoCanvas);
+    window.addEventListener("pointerup", (evt) => {
+        console.log("window.pointerup");
+        // console.log('window.pointerup, pointerInCanvas: ',pointerInCanvas);
+        // if (!pointerInCanvas){
+        dragging = false;
+        // }
+    });
+    window.addEventListener("pointermove", (evt) => {
+        if (dragging) {
+            mousePos = getMouseXY(evt);
+            dragMap(mousePos.x, mousePos.y);
+        }
+    });
+};
+
+const output = (txt, add = false) => {
+    const prevText = add ? outputDiv.innerHTML + "<br />" : "";
+    outputDiv.innerHTML = prevText + txt;
+};
+const generateGridOutput = () => {
+    // Generates and displays grid JSON data
+    // gridOutput(JSON.stringify(grid));
+    let colIndex = 0;
+    let rowIndex = 0;
+    let gridOutput = "";
+    gridOutput += `gridData = {tileSize:${tileSize}, numRows: ${numRows}, numColumns: ${numColumns}, grid:[`;
+    for (const col of grid) {
+        rowIndex = 0;
+        gridOutput += `[<br />`;
+        for (const tile of col) {
+            gridOutput += `{
+                col: ${colIndex},<br />
+                row: ${rowIndex},<br />
+                size: ${tile.size},<br />
+                diagonal: ${tile.diagonal},<br />
+                obstacle: ${tile.obstacle},<br />
+
+                endSegment: ${tile.endSegment},<br />
+                neighbors: [`;
+            for (const neighbor of tile.neighbors) {
+                if (neighbor == null) {
+                    gridOutput += "null,";
+                } else {
+                    gridOutput += `{row: ${neighbor.row}, col: ${neighbor.col}},`;
+                }
+                // End Neighbors
+            }
+            gridOutput += `]<br />},<br />`;
+            // End of Tile
+            rowIndex++;
+            gridOutput += "<br />";
+        }
+        gridOutput += `],<br />`;
+        // End of Column
+        colIndex++;
+    }
+    gridOutput += `]}`;
+    // End of grid
+    output(gridOutput);
+};
