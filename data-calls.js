@@ -37,19 +37,18 @@ for (const store of stores) {
 console.log("stores[0].tileSize: ", stores[0].tileSize);
 
 const getStore = (id) => {
+    console.log('getStore('+id+')');
     const store = stores.find((el) => el.id === id);
     const storeImg = document.querySelector("#canvas-holder img");
     storeImg.src = `./images/${store.floorPlanImage}`;
-    entranceTile = store.grid.find((el) => {
-        store.entranceTile.col, store.entranceTile.row;
-    });
-
-    checkoutTile = store.grid.find((el) => {
-        store.checkoutTile.col, store.checkoutTile.row;
-    });
-    
+    store.entranceTile = entranceTile = store.grid[store.entranceTile.col][store.entranceTile.row];
+    store.checkoutTile = checkoutTile = store.grid[store.checkoutTile.col][store.checkoutTile.row];
     return store;
 };
 
 let currentStore = getStore(1);
+
+const numTiles = currentStore.grid.length * currentStore.grid[0].length;
+console.log("# grid tiles: ",numTiles);
+
 console.log('entranceTile: ',entranceTile);

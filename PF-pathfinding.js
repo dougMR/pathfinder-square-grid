@@ -21,6 +21,9 @@ const findPathFromAtoB = (A, B) => {
     // );
 
     // start from A, get segs to all neighbors
+    if(typeof A === "undefined"){
+        console.log("A is undefined.");
+    }
     A.endSegment = makeSegment(A, A);
 
     // Keep track of all the segments we put down last iteration
@@ -158,7 +161,7 @@ const findPathFromAtoB = (A, B) => {
                         // console.log('nextNeighbor approved');
                         nextNeighbor.endSegment = newSeg;
                         // allSegments.push(newSeg);
-                        drawSegment(newSeg, "rgba(0,0,0,.1)");
+                        // drawSegment(newSeg, "rgba(0,0,0,.1)");
                         // is nextNeighbor tile B?
                         if (nextNeighbor === B) {
                             // console.log("Found Target!");
@@ -170,14 +173,10 @@ const findPathFromAtoB = (A, B) => {
                             foundTarget = true;
                             const fullPath = getFullPathFromEndSegment(newSeg);
                             // clearPaths();
-                            // console.log('fullPath: ',fullPath.length);
-                            // console.log("lastSegs: ", lastSegs);
                             clearSegsFromTiles();
                             return fullPath;
                         } else {
-                            newSeg.draw("rgba(0,0,0,0.1");
-                            // nextNeighbor.obstacle= true;
-
+                            // newSeg.draw("rgba(0,0,0,0.1");
                             if (isCorner) {
                                 newSegs.push(newSeg);
                             } else {
@@ -203,6 +202,7 @@ const findPathFromAtoB = (A, B) => {
         // } while (!foundTarget && iterations < 2000 && !noNewSegs);
     } while (!foundTarget && !noNewSegs);
     // console.log("iterations: ", iterations);
+    clearSegsFromTiles();
     return null;
 };
 
@@ -232,6 +232,7 @@ const clearPaths = () => {
 };
 
 const clearSegsFromTiles = () => {
+    // console.log("clearSegsFromTiles()");
     for (const col of grid) {
         for (const tile of col) {
             tile.endSegment = null;
@@ -344,7 +345,7 @@ const orderWaypointsByClosest = (waypoints) => {
 
 const getClosestWaypoint = (Awp, Barray) => {
     console.log("getClosestWaypoint()");
-    console.log(Awp);
+    console.log('Awp', Awp);
     console.log(Barray);
     // params: button, button array
     if (Barray < 1) {
@@ -353,7 +354,14 @@ const getClosestWaypoint = (Awp, Barray) => {
     const distances = [];
     for (let b = 0; b < Barray.length; b++) {
         const path = findPathFromAtoB(Awp, Barray[b]);
-        console.log("path: ", path);
+        console.log(
+            `path ${Awp.col},${Awp.row} -> ${Barray[b].col},${Barray[b].row}: `,
+            path.length
+        );
+        if (path === null) {
+            console.log("Awp: ", Awp);
+            console.log("Barray[b]: ", Barray[b]);
+        }
         // console.log('path.length: ',path.length);
         const dist = getPathDistance(path);
         distances.push(dist);
@@ -375,29 +383,14 @@ const getPathDistance = (path) => {
     return dist;
 };
 
-const getShortestRouteByClosest = (tiles) => {
-    const orderedWPs = [entranceTile];
-    const unorderedWPs = [...tiles];
-    let tooMuch = 0;
-    let nextWP = entranceTile;
-    console.log('entranceTile: ',entranceTile);
-    while (unorderedWPs.length > 0 && tooMuch < 100) {
-        // find closest WP of unorderedWPs to nextWP
-        // make that nextWP, pull it from unorderedWPs, push it to orderedWPs
-        nextWP = getClosestWaypoint(nextWP, unorderedWPs);
-        unorderedWPs.splice(unorderedWPs.indexOf(nextWP), 1);
-        orderedWPs.push(nextWP);
-        tooMuch++;
-    }
-    orderedWPs.push(endWP);
-    return orderedWPs;
-};
+const getShortestRouteByClosestBothEnds = (tiles) => {
+    // This gets each next closest tile, starting from start and end, then sticking result paths together
 
-const getShortestRoute = (tiles) => {
-    // THis gets each next closest tile, starting from start and end, then sticking result paths together
+    // THIS APPROACH DOES NOT WORK WELL.
+    // RESULTING PATH IS NOT LIKELY TO BE OPTIMIZED
 
-    // tiles is an array of points
-    // returns an array of tiles in optimized order
+    // tiles is an array
+    // returns an array of tiles in 'optimized' order
     // first and last tiles remain first and last
 
     //Start with start and end points,
@@ -406,16 +399,22 @@ const getShortestRoute = (tiles) => {
     // then connect the two end points
 
     const orderedWPfromStart = [entranceTile];
-    const orderedWPfromEnd = [endWP];
+    const orderedWPfromEnd = [checkoutTile];
     const unorderedWPs = [...tiles];
     let tooMuch = 0;
     let nextWP = entranceTile;
+    let endWP = checkoutTile;
     while (unorderedWPs.length > 0 && tooMuch < 100) {
+        if (nextWP === undefined) {
+            console.log("getShortestRoute > nextWP: ", nextWP);
+            console.log("unorderedWPs.length: ", unorderedWPs.length);
+        }
         // find closest WP of unorderedWPs to nextWP
         // make that nextWP, pull it from unorderedWPs, push it to orderedWPs
         nextWP = getClosestWaypoint(nextWP, unorderedWPs);
         unorderedWPs.splice(unorderedWPs.indexOf(nextWP), 1);
         orderedWPfromStart.push(nextWP);
+        
         // Do the same from endWP
         if (unorderedWPs.length > 1) {
             endWP = getClosestWaypoint(endWP, unorderedWPs);
@@ -430,6 +429,24 @@ const getShortestRoute = (tiles) => {
     orderedWPfromEnd.reverse();
     orderedWPs = [...orderedWPfromStart, ...orderedWPfromEnd];
     // returned ordered list
+    return orderedWPs;
+};
+
+const getShortestRouteByClosest = (tiles) => {
+    const orderedWPs = [entranceTile];
+    const unorderedWPs = [...tiles];
+    let tooMuch = 0;
+    let nextWP = entranceTile;
+    console.log("entranceTile: ", entranceTile);
+    while (unorderedWPs.length > 0 && tooMuch < 100) {
+        // find closest WP of unorderedWPs to nextWP
+        // make that nextWP, pull it from unorderedWPs, push it to orderedWPs
+        nextWP = getClosestWaypoint(nextWP, unorderedWPs);
+        unorderedWPs.splice(unorderedWPs.indexOf(nextWP), 1);
+        orderedWPs.push(nextWP);
+        tooMuch++;
+    }
+    orderedWPs.push(checkoutTile);
     return orderedWPs;
 };
 

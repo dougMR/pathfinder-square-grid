@@ -15,6 +15,7 @@ h1 {
     box-sizing: border-box;
     border: 2px solid purple;
     background-color: rgb(167, 255, 176);
+    overflow: hidden;
 
     user-select: none;
 }

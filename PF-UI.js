@@ -21,8 +21,11 @@ const clearItems = (evt) => {
     );
     if (clearItems) currentStore.inventory.length = 0;
 };
-const addItemToInventory = (name, x, y) => {
-    currentStore.inventory.push({ name, loc: { x, y } });
+const addItemToInventory = (names, x, y) => {
+    names = names.split(',');
+    const name = names.splice(0,1)[0];
+    const tags = [...names];
+    currentStore.inventory.push({ name, loc: { x, y }, tags });
 };
 const setItemLocation = (tile) => {
     console.log("setItemLocation: ", tile);
@@ -89,9 +92,9 @@ const startSetWaypoints = (evt) => {
               sort the in-between tiles to shrotest path from start to end
 
             */
-            const orderedWPs = getShortestRouteByClosest(waypoints);
-            // const orderedWPs = orderWaypointsByClosest(waypoints);
-            // const orderedWPs = getShortestRoute(waypoints);
+            // const orderedWPs = getShortestRouteByClosest(waypoints);
+            const orderedWPs = orderWaypointsByClosest(waypoints);
+            // const orderedWPs = getShortestRouteByClosestBothEnds(waypoints);
             // const orderedWPs = tspShortestByMutation(waypoints);
             // Need at least 2 waypoints to draw path
             console.log("orderedWaypoints: ", orderedWPs);
@@ -134,7 +137,14 @@ const startSetWaypoints = (evt) => {
     }
 };
 const setWaypoint = (tile, isStartPoint = false) => {
-    // console.log("setWaypoint: ", tile);
+    // 
+    // !! INSETAD OF using tile buttons, we should have
+    // waypoints set in a separate WP object/array, and 
+    // draw them onto canvas.
+    // Each WP needs to know its tile.
+    // 
+    // Meanwhile, this requires ToggleTileDivs to be Active, or it will break
+    // 
     // Set Tilebutton color
     const tileButton = getTileButtonByIndices(tile.col, tile.row);
     // console.log(`tileButton ${tile.col} ${tile.row}: ${tileButton}`);
@@ -146,6 +156,7 @@ const setWaypoint = (tile, isStartPoint = false) => {
         waypoints.push(tile);
     }
 };
+
 const setWaypointsFromItems = (event) => {
     if (!tileButtonsOn) createTileButtons();
     if (!settingWaypoints) startSetWaypoints();

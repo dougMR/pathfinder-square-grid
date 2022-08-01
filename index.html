@@ -10,7 +10,7 @@
         <script src="./inventories-dummy-data.js"></script>
         <script src="./PF-index.js" defer></script>
         <script src="./PF-grid.js" defer></script>
-        <script src="./data-calls.js" defer></script>        
+        <script src="./data-calls.js" defer></script>
         <script src="./PF-pathfinding.js" defer></script>
         <!-- <script src="./grid-data.js"></script> -->
         <script src="./PF-UI.js" defer></script>
@@ -20,7 +20,8 @@
         <script src="./PF-math.js"></script>
         <script src="./map-zoom-pan.js" defer></script>
         <script src="./init.js" defer></script>
-        
+        <script src="./api-calls.js"></script>
+
         <!-- <script src="pathfinding.js" type="module">
             // import * as PF from "./pathfinding.js";
         </script> -->
@@ -102,6 +103,17 @@
                     ADD GROCERY ITEM
                 </button>
             </div>
+            <div id="api-buttons">
+                <br />
+                <button id="add-all-tiles-to-api-button">
+                    ADD ALL TILES TO API
+                </button>
+                <button id="add-inventory-to-api-button">
+                    ADD INVENTORY TO API
+                </button>
+                <br />
+                <br />
+            </div>
         </div>
 
         <div id="output-container">
@@ -117,15 +129,47 @@
             <div id="output"></div>
         </div>
 
-        <style>
-            #canvas-holder {
-                overflow: hidden;
-            }
-        </style>
         <script>
             console.log("hello from index.html");
 
-            
+            const addAllTilesButton = document.getElementById(
+                "add-all-tiles-to-api-button"
+            );
+            const addInventoryToAPIButton = document.getElementById(
+                "add-inventory-to-api-button"
+            );
+            addAllTilesButton.addEventListener("pointerup", (evt) => {
+                return;
+                // ^ disable this for now.  Ran it once already.
+
+                // ! Rather than looping through hundereds or thousands of tiles,
+                // make a /bulktiles API endpoint, which accepts and array of tiles,
+                // then bulkCreate from API to db
+                const tiles = [];
+                const grid = currentStore.grid;
+                const storeID = currentStore.id;
+                for (let col = 0; col < grid.length; col++) {
+                    for (let row = 0; row < grid[col].length; row++) {
+                        const tile = grid[col][row];
+                        tiles.push({
+                            store_id: storeID,
+                            column_index: col,
+                            row_index: row,
+                            obstacle: tile.obstacle,
+                        });
+                    }
+                }
+                while (tiles.length > 0) {
+                    // break off first 100, send those
+                    const first1000 = tiles.splice(0, 1000);
+                    addTilesToDB(first1000);
+                }
+            });
+            addInventoryToAPIButton.addEventListener("pointerup", (evt) => {
+                for (const inv of dummy_inventories) {
+                    addInventoryToDB(inv.storeID, inv.inventory);
+                }
+            });
         </script>
     </body>
 </html>

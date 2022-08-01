@@ -13,7 +13,7 @@ const tspShortestByMutation = (waypoints) => {
     // waypoints does not include entrance, checkout
 
     const getWaypointsDistance = (tiles, order) => {
-        console.log("getWaypointsDistance()");
+        // console.log("getWaypointsDistance()");
         tiles = addStartAndEnd(tiles);
         order = addStartEndIndexes(order);
         let dist = 0;
@@ -23,9 +23,9 @@ const tspShortestByMutation = (waypoints) => {
             const tileBIndex = order[o + 1];
             const tileB = tiles[tileBIndex];
             // console.log('findPathFromAtoB...');
-            // const path = findPathFromAtoB(tileA, tileB);
-            // dist += getPathDistance(path);
-            dist += lookupDistance(tileA, tileB);
+            const path = findPathFromAtoB(tileA, tileB);
+            dist += getPathDistance(path);
+            // dist += lookupDistance(tileA, tileB);
         }
         return dist;
     };
@@ -121,7 +121,9 @@ const tspShortestByMutation = (waypoints) => {
                 // only checkSwap when new shortestDist is found
                 while (checkSwapEvery2Points(population[p])) {
                     // just keep doing that until it doesn't improve
-                    // console.log('checkSwap found shorter path');
+                    console.log(
+                        "try# " + tries + "checkSwap found shorter path"
+                    );
                 }
 
                 bestOrder = [...population[p]];
@@ -166,6 +168,7 @@ const tspShortestByMutation = (waypoints) => {
         // foundRepeat = 0;
         // lookedForRepeat = 0;
         // let numChecks = 0;
+        // let testOrderCollision = 0;
         for (let p = 0; p < population.length; p++) {
             // const newOrder = [...bestOrder];
             const oldOrder = [...population[p]];
@@ -195,7 +198,9 @@ const tspShortestByMutation = (waypoints) => {
                 newPopulation[p] = oldOrder;
                 // console.log("no new order for this population");
             }
+            // testOrderCollision += loops-1;
         }
+        // console.log(testOrderCollision, " Tried Same Order");
         // console.log('numChecks: ',numChecks);
         population.length = 0;
         population.push(...newPopulation);
@@ -228,10 +233,7 @@ const tspShortestByMutation = (waypoints) => {
                     // First time here
                     nextNestedArray[index] = 1;
                     uniqueOrdersTried++;
-                    if (uniqueOrdersTried >= permutations) {
-                        // Check before starting,
-                        // if maxTries * population >= permutations,
-                        // do permutations instead
+                    if (uniqueOrdersTried >= maxTries) {
                         evolveRunning = false;
                     }
                     return false;
@@ -247,9 +249,11 @@ const tspShortestByMutation = (waypoints) => {
     };
 
     // Store Entrance
-    let startWP = getTileByIndices(numColumns - 1, numRows - 1);
+    // let startWP = getTileByIndices(numColumns - 1, numRows - 1);
+    let startWP = currentStore.entranceTile;
     // Checkout
-    let endWP = getTileByIndices(Math.floor(numColumns / 2), numRows - 1);
+    // let endWP = getTileByIndices(Math.floor(numColumns / 2), numRows - 1);
+    let endWP = currentStore.checkoutTile;
 
     // For keeping track of orders already tried
     let lookedForRepeat = 0;
@@ -257,12 +261,9 @@ const tspShortestByMutation = (waypoints) => {
     let uniqueOrdersTried = 0;
     const ordersTried = [];
 
-    const maxTries = Math.pow(Math.ceil(waypoints.length), 2);
+    const maxTries = Math.pow(Math.ceil(waypoints.length * 0.5), 2);
     const populationNum = maxTries;
-    const maxCheckNewOrderLoops = Math.pow(waypoints.length, 2);
-
-    console.log("maxTries, ", maxTries);
-    console.log("populationNum: ", populationNum);
+    const maxCheckNewOrderLoops = Math.pow(waypoints.length * 0.5, 2);
 
     // population of orders
     const population = [];
@@ -282,28 +283,49 @@ const tspShortestByMutation = (waypoints) => {
 
     let shortestDist = getWaypointsDistance(waypoints, order);
 
+    // Check before starting,
+    // if maxTries * population >= permutations,
+    // do permutations instead
     const permutations = factorialize(order.length - 2);
+    if (maxTries * population > permutations) {
+        maxTries = permutations;
+    }
+
+    console.log("maxTries, ", maxTries);
+    console.log("populationNum: ", populationNum);
 
     let bestOrder = [...order];
 
     // set random populations
     for (let p = 0; p < populationNum; p++) {
         population[p] = [...order];
+        // console.log("p1: ",population[p]);
         shuffle(population[p], 10);
+        // console.log("p2: ",population[p]);
     }
 
     do {
-        console.log("calcFitness...");
+        const startIteration = performance.now();
+        // const startCollision = foundRepeat;
+        // console.log("calcFitness...");
         calculateFitness();
-        console.log("normalize...");
+        // console.log("normalize...");
         normalizeFitness();
-        console.log("nextGen...");
+        // console.log("nextGen...");
         nextGeneration();
         // console.log('checkSwapAllPopulation...');
         // checkSwapEvery2PointsOfPopulation();
         tries++;
-        console.log("tries: ", tries);
+        console.log("tries: ", tries, "of ",maxTries);
+        // console.log("unique orders: ", uniqueOrdersTried);
+        // console.log("collisions: ", foundRepeat - startCollision);
+        console.log(` ----- try ${tries} took ${(performance.now()-startIteration).toLocaleString("en","us")}`);
     } while (tries < maxTries);
+    console.log('-----------------------------')
+    console.log("lookedForRepeat: ",lookedForRepeat);
+    console.log("unique orders: ", uniqueOrdersTried);
+    console.log("collisions: ", foundRepeat);
+    console.log(uniqueOrdersTried+foundRepeat);
 
     return reorderWaypoints(waypoints, bestOrder);
 };

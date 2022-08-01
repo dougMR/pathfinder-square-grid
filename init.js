@@ -8,8 +8,9 @@ function init() {
     // grid = buildGrid(numColumns, numRows);
     // grid = buildGridFromData(gridData);
 
-
-    grid = buildGridFromData(currentStore);
+    buildGridFromData(currentStore);
+    grid = currentStore.grid;
+    // grid = buildGridFromData(currentStore);
     setNeighbors(grid);
     const diagonal = Math.sqrt(tileSize * tileSize + tileSize * tileSize);
     console.log("diagonal ratio: ", (diagonal - tileSize) / tileSize);
@@ -29,7 +30,7 @@ function init() {
     makeMapCanvasHandlers();
     // createLookupForCurrentMap();
     console.log(
-        `All to All: ${getLengthOfAllToAll(grid.length).toLocaleString(
+        `All to All: ${getLengthOfAllToAll(grid.length * grid[0].length).toLocaleString(
             "en",
             "US"
         )} ways...`
