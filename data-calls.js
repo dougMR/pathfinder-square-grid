@@ -46,7 +46,7 @@ const getStore = (id) => {
     return store;
 };
 
-let currentStore = getStore(1);
+let currentStore = getStore(2);
 
 const numTiles = currentStore.grid.length * currentStore.grid[0].length;
 console.log("# grid tiles: ",numTiles);

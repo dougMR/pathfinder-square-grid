@@ -1,3 +1,56 @@
+const APIUrl = "http://localhost:3001";
+
+const logIn = async () => {
+    try {
+        const response = await fetch(`${APIUrl}/login`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                username: "Doug R",
+                password: "secretpassword",
+            }),
+            credentials: "include",
+        });
+        const data = await response.json();
+        console.log("login data: ", data);
+    } catch (error) {
+        console.log("LOGIN ERROR: ", error);
+    }
+};
+logIn();
+
+// Add random items from inventory to list_items
+const addRandomItemsToShoppingList = async () => {
+    const storeID = 1;
+    const userID = 1;
+    // get inventory for userID/storeID
+    const response = await fetch(
+        `http://localhost:3001/store/inventory/${storeID}`
+    );
+    const data = await response.json();
+    const inventory = data.inventory;
+    console.log("data.inventory.length: ", data.inventory.length);
+    for (const item of inventory) {
+        if (Math.random() < 0.5) {
+            const response2 = await fetch(`${APIUrl}/list-item`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    inventoryID: item.id,
+                }),
+                credentials: "include",
+            });
+            console.log("response2: ", response2);
+            const data2 = await response2.json();
+            console.log("shopping list length: ", data2.length);
+        }
+    }
+};
+
 // Add Tile to tiles table
 const addTileToDB = async (storeID, col, row, obstacle) => {
     const response = await fetch("http://localhost:3001/tile", {

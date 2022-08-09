@@ -93,9 +93,9 @@ const startSetWaypoints = (evt) => {
 
             */
             // const orderedWPs = getShortestRouteByClosest(waypoints);
-            const orderedWPs = orderWaypointsByClosest(waypoints);
+            // const orderedWPs = orderWaypointsByClosest(waypoints);
             // const orderedWPs = getShortestRouteByClosestBothEnds(waypoints);
-            // const orderedWPs = tspShortestByMutation(waypoints);
+            const orderedWPs = tspShortestByMutation(waypoints);
             // Need at least 2 waypoints to draw path
             console.log("orderedWaypoints: ", orderedWPs);
             for (let wp = 0; wp < orderedWPs.length - 1; wp++) {

@@ -297,47 +297,261 @@ let dummy_inventories = [
         storeID: 2,
         inventory: [
             {
-                name: "milk",
-                loc: {
-                    x: 13,
-                    y: 25,
-                },
+                "name": "milk",
+                "loc": {
+                    "x": 13,
+                    "y": 25
+                }
             },
             {
-                name: "cheddar cheese",
-                loc: {
-                    x: 25,
-                    y: 15,
-                },
+                "name": "cheddar cheese",
+                "loc": {
+                    "x": 25,
+                    "y": 15
+                }
             },
             {
-                name: "beans",
-                loc: {
-                    x: 36,
-                    y: 28,
-                },
+                "name": "beans",
+                "loc": {
+                    "x": 36,
+                    "y": 28
+                }
             },
             {
-                name: "salad",
-                loc: {
-                    x: 92,
-                    y: 8,
-                },
+                "name": "salad",
+                "loc": {
+                    "x": 92,
+                    "y": 8
+                }
             },
             {
-                name: "bread",
-                loc: {
-                    x: 100,
-                    y: 35,
-                },
+                "name": "bread",
+                "loc": {
+                    "x": 100,
+                    "y": 35
+                }
             },
             {
-                name: "peanut butter",
-                loc: {
-                    x: 36,
-                    y: 53,
-                },
+                "name": "peanut butter",
+                "loc": {
+                    "x": 36,
+                    "y": 53
+                }
             },
+            {
+                "name": "whipped cream",
+                "loc": {
+                    "x": 13,
+                    "y": 32
+                },
+                "tags": [
+                    "whip cream",
+                    "whipped topping",
+                    "whip topping"
+                ]
+            },
+            {
+                "name": "worcestershire sauce",
+                "loc": {
+                    "x": 47,
+                    "y": 44
+                },
+                "tags": []
+            },
+            {
+                "name": "frozen vegetables",
+                "loc": {
+                    "x": 90,
+                    "y": 39
+                },
+                "tags": []
+            },
+            {
+                "name": "mixed vegetables",
+                "loc": {
+                    "x": 90,
+                    "y": 46
+                },
+                "tags": []
+            },
+            {
+                "name": "vinegar",
+                "loc": {
+                    "x": 48,
+                    "y": 55
+                },
+                "tags": []
+            },
+            {
+                "name": "tuna",
+                "loc": {
+                    "x": 63,
+                    "y": 39
+                },
+                "tags": []
+            },
+            {
+                "name": "tonic water",
+                "loc": {
+                    "x": 62,
+                    "y": 21
+                },
+                "tags": []
+            },
+            {
+                "name": "tooth paste",
+                "loc": {
+                    "x": 92,
+                    "y": 61
+                },
+                "tags": [
+                    "toothpaste"
+                ]
+            },
+            {
+                "name": "tomato paste",
+                "loc": {
+                    "x": 54,
+                    "y": 50
+                },
+                "tags": []
+            },
+            {
+                "name": "tomato sauce",
+                "loc": {
+                    "x": 58,
+                    "y": 50
+                },
+                "tags": []
+            },
+            {
+                "name": "spaghetti sauce",
+                "loc": {
+                    "x": 60,
+                    "y": 50
+                },
+                "tags": []
+            },
+            {
+                "name": "tofu",
+                "loc": {
+                    "x": 17,
+                    "y": 16
+                },
+                "tags": []
+            },
+            {
+                "name": "tea",
+                "loc": {
+                    "x": 32,
+                    "y": 63
+                },
+                "tags": []
+            },
+            {
+                "name": "taco",
+                "loc": {
+                    "x": 44,
+                    "y": 44
+                },
+                "tags": []
+            },
+            {
+                "name": "sugar",
+                "loc": {
+                    "x": 42,
+                    "y": 47
+                },
+                "tags": []
+            },
+            {
+                "name": "syrup",
+                "loc": {
+                    "x": 44,
+                    "y": 47
+                },
+                "tags": []
+            },
+            {
+                "name": "soda",
+                "loc": {
+                    "x": 66,
+                    "y": 24
+                },
+                "tags": []
+            },
+            {
+                "name": "seltzer",
+                "loc": {
+                    "x": 65,
+                    "y": 21
+                },
+                "tags": []
+            },
+            {
+                "name": "beer",
+                "loc": {
+                    "x": 77,
+                    "y": 67
+                },
+                "tags": []
+            },
+            {
+                "name": "soup",
+                "loc": {
+                    "x": 61,
+                    "y": 42
+                },
+                "tags": []
+            },
+            {
+                "name": "snacks",
+                "loc": {
+                    "x": 75,
+                    "y": 50
+                },
+                "tags": []
+            },
+            {
+                "name": "pretzels",
+                "loc": {
+                    "x": 75,
+                    "y": 54
+                },
+                "tags": []
+            },
+            {
+                "name": "chips",
+                "loc": {
+                    "x": 75,
+                    "y": 53
+                },
+                "tags": []
+            },
+            {
+                "name": "shampoo",
+                "loc": {
+                    "x": 95,
+                    "y": 64
+                },
+                "tags": []
+            },
+            {
+                "name": "salt",
+                "loc": {
+                    "x": 39,
+                    "y": 53
+                },
+                "tags": []
+            },
+            {
+                "name": "salad dressing",
+                "loc": {
+                    "x": 45,
+                    "y": 37
+                },
+                "tags": []
+            }
         ],
     },
 ];

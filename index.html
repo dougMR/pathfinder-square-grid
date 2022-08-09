@@ -111,6 +111,9 @@
                 <button id="add-inventory-to-api-button">
                     ADD INVENTORY TO API
                 </button>
+                <button id="add-list-items-to-db-button">
+                    ADD SHOPPING-LIST TO API
+                </button>
                 <br />
                 <br />
             </div>
@@ -138,6 +141,7 @@
             const addInventoryToAPIButton = document.getElementById(
                 "add-inventory-to-api-button"
             );
+            const addShoppingListToAPIButton = document.getElementById("add-list-items-to-db-button");
             addAllTilesButton.addEventListener("pointerup", (evt) => {
                 return;
                 // ^ disable this for now.  Ran it once already.
@@ -169,6 +173,9 @@
                 for (const inv of dummy_inventories) {
                     addInventoryToDB(inv.storeID, inv.inventory);
                 }
+            });
+            addShoppingListToAPIButton.addEventListener("pointerup", evt => {
+                addRandomItemsToShoppingList();
             });
         </script>
     </body>
