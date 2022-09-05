@@ -114,6 +114,9 @@
                 <button id="add-list-items-to-db-button">
                     ADD SHOPPING-LIST TO API
                 </button>
+                <button id="set-obstacles-button">
+                    SET TILE OBSTACLES IN DB
+                </button>
                 <br />
                 <br />
             </div>
@@ -134,14 +137,18 @@
 
         <script>
             console.log("hello from index.html");
-
+            const setObstaclesButton = document.getElementById(
+                "set-obstacles-button"
+            );
             const addAllTilesButton = document.getElementById(
                 "add-all-tiles-to-api-button"
             );
             const addInventoryToAPIButton = document.getElementById(
                 "add-inventory-to-api-button"
             );
-            const addShoppingListToAPIButton = document.getElementById("add-list-items-to-db-button");
+            const addShoppingListToAPIButton = document.getElementById(
+                "add-list-items-to-db-button"
+            );
             addAllTilesButton.addEventListener("pointerup", (evt) => {
                 return;
                 // ^ disable this for now.  Ran it once already.
@@ -170,12 +177,21 @@
                 }
             });
             addInventoryToAPIButton.addEventListener("pointerup", (evt) => {
+                return;
+                // ^  DR 9/2/22 - turned off to prevent accidentally triggering
                 for (const inv of dummy_inventories) {
                     addInventoryToDB(inv.storeID, inv.inventory);
                 }
             });
-            addShoppingListToAPIButton.addEventListener("pointerup", evt => {
+            addShoppingListToAPIButton.addEventListener("pointerup", (evt) => {
+                return;
+                // ^  DR 9/2/22 - turned off to prevent accidentally triggering
                 addRandomItemsToShoppingList();
+            });
+            setObstaclesButton.addEventListener("pointerup", (evt) => {
+                return;
+                // ^  DR 9/2/22 - turned off to prevent accidentally triggering
+                addTileObstaclesToDB();
             });
         </script>
     </body>

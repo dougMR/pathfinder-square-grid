@@ -96,7 +96,7 @@ const buildGrid = (numColumns, numRows) => {
 };
 
 const recalcTileSize = () => {
-    currentStore.tileSize = mapCanvas.offsetWidth / numColumns;
+    tileSize = currentStore.tileSize = mapCanvas.offsetWidth / numColumns;
 };
 
 const getTileCenterOnCanvas = (tile) => {

@@ -175,3 +175,34 @@ const errorCatchingExample = async (storeID, col, row, obstacle) => {
         console.log("Something went wrong with the server");
     }
 };
+
+// 
+// Manually set the tiles and obstacles in this function before calling
+// 
+const addTileObstaclesToDB = async () => {
+    // Custom settings
+    // const startCol = 58;
+    // const endCol = 95;
+    // const col = 58;
+    // const row = 86;
+    const tiles = [];
+    for (let row = 82; row <= 85; row++) {
+        tiles.push({
+            col: 95,
+            row: row,
+            obstacle: true,
+        });
+    }
+    // Call the API
+    const response = await fetch(`${APIUrl}/tiles/obstacle`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            tiles,
+        }),
+    });
+    const data = await response.json();
+    console.log("SET TILES OBSCACLES data: ", data);
+};

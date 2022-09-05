@@ -22,8 +22,8 @@ const clearItems = (evt) => {
     if (clearItems) currentStore.inventory.length = 0;
 };
 const addItemToInventory = (names, x, y) => {
-    names = names.split(',');
-    const name = names.splice(0,1)[0];
+    names = names.split(",");
+    const name = names.splice(0, 1)[0];
     const tags = [...names];
     currentStore.inventory.push({ name, loc: { x, y }, tags });
 };
@@ -44,11 +44,27 @@ const setItemLocation = (tile) => {
                 window.alert("Tile is obstructed.");
                 return;
             }
-            // Set item at location
-            addItemToInventory(itemInput.value, tile.col, tile.row);
-            itemInput.value = "";
-            setItemLocationButton.classList.remove("waiting");
-            settingItemLocation = false;
+            console.log('currentStore: ',currentStore.name);
+            console.log('currentStore.inventory: ',currentStore.inventory);
+            const itemAlreadyInInventory = currentStore.inventory.find((el) => {
+                return el.name === itemInput.value;
+            });
+            console.log('currentStore.inventory.contains ',itemInput.value,':',currentStore.inventory.find(el=>el.name===itemInput.value));
+            
+            if (itemAlreadyInInventory) {
+                window.alert(
+                    `${itemInput.name} is already in ${currentStore.name} inventory.`
+                );
+            } else {
+                
+                // Set item at location
+                console.log("ADD TO INVENTORY");
+                addItemToInventory(itemInput.value, tile.col, tile.row);
+                itemInput.value = "";
+                setItemLocationButton.classList.remove("waiting");
+                settingItemLocation = false;
+            }
+
             // console.log("currentStore.inventory: ", currentStore.inventory);
         } else {
             // location is null
@@ -137,14 +153,15 @@ const startSetWaypoints = (evt) => {
     }
 };
 const setWaypoint = (tile, isStartPoint = false) => {
-    // 
+    console.log("waypoint TILE: ", tile);
+    //
     // !! INSETAD OF using tile buttons, we should have
-    // waypoints set in a separate WP object/array, and 
+    // waypoints set in a separate WP object/array, and
     // draw them onto canvas.
     // Each WP needs to know its tile.
-    // 
+    //
     // Meanwhile, this requires ToggleTileDivs to be Active, or it will break
-    // 
+    //
     // Set Tilebutton color
     const tileButton = getTileButtonByIndices(tile.col, tile.row);
     // console.log(`tileButton ${tile.col} ${tile.row}: ${tileButton}`);
@@ -185,7 +202,9 @@ const toggleOutput = (evt) => {
             generateGridOutput();
         } else if (id === "inventory-data-button") {
             const itemsJson =
-                "<pre>" + JSON.stringify(currentStore.inventory, null, 4) + "</pre>";
+                "<pre>" +
+                JSON.stringify(currentStore.inventory, null, 4) +
+                "</pre>";
             output(itemsJson);
         }
     } else {
