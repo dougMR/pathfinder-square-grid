@@ -52,3 +52,4 @@ const numTiles = currentStore.grid.length * currentStore.grid[0].length;
 console.log("# grid tiles: ",numTiles);
 
 console.log('entranceTile: ',entranceTile);
+

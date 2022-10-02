@@ -1050,6 +1050,134 @@ let dummy_inventories = [
                     "y": 15
                 },
                 "tags": []
+            },
+            {
+                "name": "orange soda",
+                "loc": {
+                    "x": 56,
+                    "y": 21
+                },
+                "tags": [
+                    "pop",
+                    "soda"
+                ]
+            },
+            {
+                "name": "oranges",
+                "loc": {
+                    "x": 101,
+                    "y": 13
+                },
+                "tags": [
+                    "fruit",
+                    "citrus",
+                    "produce"
+                ]
+            },
+            {
+                "name": "orange juice",
+                "loc": {
+                    "x": 13,
+                    "y": 33
+                },
+                "tags": [
+                    "OJ"
+                ]
+            },
+            {
+                "name": "granola bars",
+                "loc": {
+                    "x": 56,
+                    "y": 44
+                },
+                "tags": [
+                    "cereal",
+                    "candy"
+                ]
+            },
+            {
+                "name": "oatmeal",
+                "loc": {
+                    "x": 69,
+                    "y": 55
+                },
+                "tags": [
+                    "cereal"
+                ]
+            },
+            {
+                "name": "greeting card",
+                "loc": {
+                    "x": 27,
+                    "y": 88
+                },
+                "tags": []
+            },
+            {
+                "name": "cheese popcorn",
+                "loc": {
+                    "x": 75,
+                    "y": 57
+                },
+                "tags": []
+            },
+            {
+                "name": "cheese curls",
+                "loc": {
+                    "x": 75,
+                    "y": 40
+                },
+                "tags": []
+            },
+            {
+                "name": "swiss cheese",
+                "loc": {
+                    "x": 20,
+                    "y": 15
+                },
+                "tags": []
+            },
+            {
+                "name": "cottage cheese",
+                "loc": {
+                    "x": 18,
+                    "y": 16
+                },
+                "tags": []
+            },
+            {
+                "name": "dish soap",
+                "loc": {
+                    "x": 48,
+                    "y": 66
+                },
+                "tags": []
+            },
+            {
+                "name": "laundry soap",
+                "loc": {
+                    "x": 54,
+                    "y": 68
+                },
+                "tags": []
+            },
+            {
+                "name": "hand soap",
+                "loc": {
+                    "x": 44,
+                    "y": 60
+                },
+                "tags": [
+                    "bar soap"
+                ]
+            },
+            {
+                "name": "liquid soap",
+                "loc": {
+                    "x": 39,
+                    "y": 61
+                },
+                "tags": []
             }
         ],
     },

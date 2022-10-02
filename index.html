@@ -177,7 +177,7 @@
                 }
             });
             addInventoryToAPIButton.addEventListener("pointerup", (evt) => {
-                return;
+                // return;
                 // ^  DR 9/2/22 - turned off to prevent accidentally triggering
                 for (const inv of dummy_inventories) {
                     addInventoryToDB(inv.storeID, inv.inventory);

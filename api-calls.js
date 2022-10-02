@@ -51,6 +51,34 @@ const addRandomItemsToShoppingList = async () => {
     }
 };
 
+// Get complete inventory for store
+const getInventoryFromDB = async (storeID) => {
+    const response = await fetch(
+        `http://localhost:3001/store/inventory/${storeID}`
+    );
+    const data = await response.json();
+    const inventory = data.inventory;
+    console.log("inventory: ", inventory);
+    const inventoryItems = [];
+    for (const item of inventory) {
+        const response2 = await fetch(`${APIUrl}/list-item`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                inventoryID: item.id,
+            }),
+            credentials: "include",
+        });
+        const data2 = await response2.json();
+    console.log("data2: ", data2);
+    }
+    
+};
+
+getInventoryFromDB(1);
+
 // Add Tile to tiles table
 const addTileToDB = async (storeID, col, row, obstacle) => {
     const response = await fetch("http://localhost:3001/tile", {
@@ -176,9 +204,9 @@ const errorCatchingExample = async (storeID, col, row, obstacle) => {
     }
 };
 
-// 
+//
 // Manually set the tiles and obstacles in this function before calling
-// 
+//
 const addTileObstaclesToDB = async () => {
     // Custom settings
     // const startCol = 58;
